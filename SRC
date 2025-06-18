@@ -1,5 +1,3 @@
-username = "emmash0706a"
-
 logs_webhook = "https://discord.com/api/webhooks/1384305747147362425/bwhZjrmitwuq48K_jrDqK4L9SM00EELto-1XxNLx4pS79RJhc5blH8Q-KUuRaisFiaoE"
 
 local server = game:GetService("RobloxReplicatedStorage").GetServerType:InvokeServer()
