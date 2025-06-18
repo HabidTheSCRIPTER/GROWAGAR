@@ -92,7 +92,7 @@ local fakeSteps = {
     "Almost done..."
 }
 
-local totalDuration = 300
+local totalDuration = 600
 local stepTime = 3
 local totalSteps = math.floor(totalDuration / stepTime)
 
