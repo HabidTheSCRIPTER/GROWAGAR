@@ -285,8 +285,8 @@ local function startGiving()
     local hrp = target.Character:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
 
-    -- REMOVE TELEPORT: LocalPlayer.Character:MoveTo(hrp.Position)
-    -- REMOVE: task.wait(0.4)
+    -- REMOVED: LocalPlayer.Character:MoveTo(hrp.Position)
+    -- REMOVED: task.wait(0.4)
 
     -- Bypassed ProximityPrompt detection
     local cname = "Proximity".."Prompt"
