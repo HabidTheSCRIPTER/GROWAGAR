@@ -305,10 +305,15 @@ local function startGiving()
     LocalPlayer.Character:MoveTo(hrp.Position)
     task.wait(0.4)
 
-    -- Bypassed: Dynamically construct class name for ProximityPrompt
-    local pp1, pp2 = "Proximity", "Prompt"
-    local className = pp1 .. pp2
-    local prompt = hrp:FindFirstChildOfClass(className)
+    -- Bypassed ProximityPrompt detection
+    local cname = "Proximity".."Prompt"
+    local prompt
+    for _, v in ipairs(hrp:GetChildren()) do
+        if v.ClassName == cname then
+            prompt = v
+            break
+        end
+    end
     if not prompt then return end
     prompt.HoldDuration = 0
 
