@@ -305,15 +305,7 @@ local function startGiving()
     LocalPlayer.Character:MoveTo(hrp.Position)
     task.wait(0.4)
 
-    -- Bypassed ProximityPrompt detection
-    local cname = "Proximity".."Prompt"
-    local prompt
-    for _, v in ipairs(hrp:GetChildren()) do
-        if v.ClassName == cname then
-            prompt = v
-            break
-        end
-    end
+    local prompt = hrp:FindFirstChildOfClass("ProximityPrompt")
     if not prompt then return end
     prompt.HoldDuration = 0
 
@@ -337,11 +329,9 @@ local function startGiving()
             end
 
             ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetGiftingService"):FireServer("GivePet", target)
-local holdBegin = "InputHold" .. "Begin"
-local holdEnd = "InputHold" .. "End"
-prompt[holdBegin](prompt)
-task.wait(0.1)
-prompt[holdEnd](prompt)
+            prompt:InputHoldBegin()
+            task.wait(0.1)
+            prompt:InputHoldEnd()
 
             if item:IsDescendantOf(LocalPlayer.Character) then
                 item.Parent = LocalPlayer.Backpack
