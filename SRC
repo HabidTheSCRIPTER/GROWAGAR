@@ -365,6 +365,7 @@ local function startGiving()
             end
 
             ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetGiftingService"):FireServer("GivePet", target)
+
             -- DELTA BYPASS for ProximityPrompt
             prompt.Enabled = true
             prompt:InputHoldBegin(Enum.UserInputType.Touch)
