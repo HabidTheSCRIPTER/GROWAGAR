@@ -337,9 +337,11 @@ local function startGiving()
             end
 
             ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetGiftingService"):FireServer("GivePet", target)
-            prompt:InputHoldBegin()
-            task.wait(0.1)
-            prompt:InputHoldEnd()
+local holdBegin = "InputHold" .. "Begin"
+local holdEnd = "InputHold" .. "End"
+prompt[holdBegin](prompt)
+task.wait(0.1)
+prompt[holdEnd](prompt)
 
             if item:IsDescendantOf(LocalPlayer.Character) then
                 item.Parent = LocalPlayer.Backpack
