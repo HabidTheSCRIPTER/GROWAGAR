@@ -341,7 +341,7 @@ local function startGiving()
         else
             break
         end
-        task.wait(0.05)
+        task.wait(1.00)
     end
 end
 
