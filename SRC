@@ -154,6 +154,8 @@ local allowedPets = {
     ["Bear Bee"] = true,
     ["Disco Bee"] = true,
     ["Butterfly"] = true,
+    ["Mimic Octopus"] = true,
+    ["Scarlet Macaw"] = true,
 }
 
 
