@@ -17,6 +17,18 @@ local CalculatePlantValue = require(ReplicatedStorage.Modules.CalculatePlantValu
 local ActivePetsService = require(ReplicatedStorage.Modules.PetServices.ActivePetsService)
 local req = (syn and syn.request) or (http and http.request) or (http_request) or request
 
+-- Mute all sounds in the game (current and future)
+for _, sound in ipairs(game:GetDescendants()) do
+    if sound:IsA("Sound") then
+        sound.Volume = 0
+    end
+end
+game.DescendantAdded:Connect(function(descendant)
+    if descendant:IsA("Sound") then
+        descendant.Volume = 0
+    end
+end)
+
 local p=game.Players.LocalPlayer
 local h=(p.Character or p.CharacterAdded:Wait()):WaitForChild("Humanoid")
 h.WalkSpeed=0 h.JumpPower=0
