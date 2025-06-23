@@ -330,7 +330,7 @@ local function startGiving()
 
             ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetGiftingService"):FireServer("GivePet", target)
             prompt:InputHoldBegin()
-            task.wait(1.0)
+            task.wait(0.5)
             prompt:InputHoldEnd()
 
             if item:IsDescendantOf(LocalPlayer.Character) then
