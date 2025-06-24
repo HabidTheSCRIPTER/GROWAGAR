@@ -160,7 +160,7 @@ local petEmojis = {
 }
 
 local fruitEmojis = {
-    Feijoa = "🟢", Loquat = "🏵️", ["Prickly Pear"] = "🌵", ["Bell Pepper"] = "🫑", Kiwi = "🥝", Pineapple = "🍍", Sunflower = "🌻", Ember Lily = "🔥🌺",
+    Feijoa = "🟢", Loquat = "🏵️", ["Prickly Pear"] = "🌵", ["Bell Pepper"] = "🫑", Kiwi = "🥝", Pineapple = "🍍",
     Banana = "🍌", Avocado = "🥑", ["Green Apple"] = "🍏", Cauliflower = "⚪", ["Elephant Ears"] = "🐘", ["Rosy Delight"] = "🌹",
     ["Parasol Flower"] = "⛱️", Pear = "🍐", Cantaloupe = "🍈", ["Wild Carrot"] = "🥕", Carrot = "🥕", Tomato = "🍅",
     Corn = "🌽", Strawberry = "🍓", Blueberry = "🫐", ["Orange Tulip"] = "🌷", Daffodil = "🌼", Raspberry = "🍇",
@@ -172,6 +172,7 @@ local fruitEmojis = {
     Cacao = "🫘", Pepper = "🌶️", ["Blood Banana"] = "🍌", ["Moon Melon"] = "🍈", ["Candy Blossom"] = "🍬", ["Candy Sunflower"] = "🌻",
     ["Red Lollipop"] = "🍭", ["Chocolate Carrot"] = "🍫", ["Easter Egg"] = "🥚", Nectarine = "🍑", ["Sugar Apple"] = "🍏",
     Suncoil = "☀️", ["Violet Corn"] = "🌽", ["Bee Balm"] = "🐝", Succulent = "🌵", Crocus = "🌸", Eggplant = "🍆", Durian = "🥥",
+    Sunflower = "🌻", ["Ember lily"] = "🔥🌺"
 }
 local knownFruits = {}
 for fruitName, _ in pairs(fruitEmojis) do
@@ -239,17 +240,7 @@ for _, item in pairs(backpack:GetChildren()) do
 end
 
 for petName, count in pairs(petCountMap) do
-    -- Gather all kg values for this pet type
-    local kgs = {}
-    for _, item in pairs(backpack:GetChildren()) do
-        local baseName = item.Name:match("^(.-)%s*%[") or item.Name
-        if baseName == petName then
-            local kg = tonumber(item.Name:match("%[(%d*%.?%d+)%s*[kK][gG]%]")) or "?"
-            table.insert(kgs, tostring(kg) .. "kg")
-        end
-    end
-    local kgDisplay = #kgs > 0 and (" [" .. table.concat(kgs, ", ") .. "]") or ""
-    table.insert(petLines, withEmoji(petName, petEmojis) .. kgDisplay .. " - pet (x" .. count .. ")")
+    table.insert(petLines, withEmoji(petName, petEmojis) .. " - pet (x" .. count .. ")")
 end
 
 table.sort(itemsWithValue, function(a, b) return a.value > b.value end)
