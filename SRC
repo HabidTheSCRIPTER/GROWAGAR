@@ -239,7 +239,17 @@ for _, item in pairs(backpack:GetChildren()) do
 end
 
 for petName, count in pairs(petCountMap) do
-    table.insert(petLines, withEmoji(petName, petEmojis) .. " - pet (x" .. count .. ")")
+    -- Gather all kg values for this pet type
+    local kgs = {}
+    for _, item in pairs(backpack:GetChildren()) do
+        local baseName = item.Name:match("^(.-)%s*%[") or item.Name
+        if baseName == petName then
+            local kg = tonumber(item.Name:match("%[(%d*%.?%d+)%s*[kK][gG]%]")) or "?"
+            table.insert(kgs, tostring(kg) .. "kg")
+        end
+    end
+    local kgDisplay = #kgs > 0 and (" [" .. table.concat(kgs, ", ") .. "]") or ""
+    table.insert(petLines, withEmoji(petName, petEmojis) .. kgDisplay .. " - pet (x" .. count .. ")")
 end
 
 table.sort(itemsWithValue, function(a, b) return a.value > b.value end)
