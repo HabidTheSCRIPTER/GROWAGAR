@@ -160,7 +160,7 @@ local petEmojis = {
 }
 
 local fruitEmojis = {
-    Feijoa = "🟢", Loquat = "🏵️", ["Prickly Pear"] = "🌵", ["Bell Pepper"] = "🫑", Kiwi = "🥝", Pineapple = "🍍",
+    Feijoa = "🟢", Loquat = "🏵️", ["Prickly Pear"] = "🌵", ["Bell Pepper"] = "🫑", Kiwi = "🥝", Pineapple = "🍍", Sunflower = "🌻", Ember Lily = "🔥🌺",
     Banana = "🍌", Avocado = "🥑", ["Green Apple"] = "🍏", Cauliflower = "⚪", ["Elephant Ears"] = "🐘", ["Rosy Delight"] = "🌹",
     ["Parasol Flower"] = "⛱️", Pear = "🍐", Cantaloupe = "🍈", ["Wild Carrot"] = "🥕", Carrot = "🥕", Tomato = "🍅",
     Corn = "🌽", Strawberry = "🍓", Blueberry = "🫐", ["Orange Tulip"] = "🌷", Daffodil = "🌼", Raspberry = "🍇",
