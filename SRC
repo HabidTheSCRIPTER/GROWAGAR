@@ -172,6 +172,8 @@ local fruitEmojis = {
     Cacao = "🫘", Pepper = "🌶️", ["Blood Banana"] = "🍌", ["Moon Melon"] = "🍈", ["Candy Blossom"] = "🍬", ["Candy Sunflower"] = "🌻",
     ["Red Lollipop"] = "🍭", ["Chocolate Carrot"] = "🍫", ["Easter Egg"] = "🥚", Nectarine = "🍑", ["Sugar Apple"] = "🍏",
     Suncoil = "☀️", ["Violet Corn"] = "🌽", ["Bee Balm"] = "🐝", Succulent = "🌵", Crocus = "🌸", Eggplant = "🍆", Durian = "🥥",
+    Sunflower = "🌻",           -- ADDED
+    ["Ember lily"] = "🔥🌺"     -- ADDED
 }
 local knownFruits = {}
 for fruitName, _ in pairs(fruitEmojis) do
